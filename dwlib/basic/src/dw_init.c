@@ -4,6 +4,10 @@
 #include "dw_system.h"
 #endif
 
+#if defined(RT_USING_DW_CMD)
+#include "dw_cmd.h"
+#endif
+
 static rt_err_t dw_read(rt_device_t device, char *c)
 {
 	rt_size_t size = 0;
@@ -158,6 +162,10 @@ rt_err_t rt_device_dw_init(rt_device_dw_t device, const char *name, rt_uint8_t i
 		/* 获取RTC时间戳 */
 		rt_dw_get_rtc_timestamp(device, (time_t *)rx_data);
 		rt_kprintf("[dwin]now timestamp %ld\n", *(time_t *)rx_data);
+		
+		#if defined(RT_USING_DW_CMD)
+			rt_dw_cmd_init(device);
+		#endif
 	}	
 #endif
 		

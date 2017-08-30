@@ -7,6 +7,10 @@ extern "C" {
 	
 #include "dw_init.h"
 
+#if defined(RT_USING_DW_CMD)
+    #include "dw_cmd.h"
+#endif
+
 #if defined(RT_USING_DW_SYSTEM)
     #include "dw_system.h"
 #endif
