@@ -35,7 +35,7 @@ ver 1.3.0
 rtconfig.h支持库功能宏开关, 方便库的代码大小剪切:
 ~~~
     2.01. RT_USING_DWIN                 开启迪文库
-    2.02. RT_USING_DMT48270M043_02W     选择迪文库支持类型, 目前只支持RT_USING_DMT48270M043_02W和RT_USING_DMT48270M050_02W 2款型号，其他型号未测试
+    2.02. RT_USING_DMT48270M043_02W     选择迪文库支持类型, 目前只支持2款型号
     2.03. RT_USING_DW_CMD               开启迪文库finsh和msh命令插件，注意开启该功能需要代码先开启finsh或者msh组件
     2.04. RT_USING_DW_SYSTEM            开启迪文库系统设置和查询功能
     2.05. RT_USING_DW_LOGIN             开启登陆机制插件
