@@ -22,6 +22,11 @@ if GetDepend('RT_USING_DW_SYSTEM'):
 	src = src + ['./dwlib/plugins/system/dw_system.c']
 	inc = inc + [cwd + '/dwlib/plugins/system']
 
+#add cmd plugins code
+if GetDepend('RT_USING_DW_CMD'):
+	src = src + ['./dwlib/plugins/cmd/dw_cmd.c']
+	inc = inc + [cwd + '/dwlib/plugins/cmd']
+
 #add login plugins code
 if GetDepend('RT_USING_DW_LOGIN'):
 	src = src + ['./dwlib/plugins/login/dw_login.c']
