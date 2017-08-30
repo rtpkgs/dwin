@@ -68,15 +68,3 @@ rt_err_t rt_dw_plugins_vicon_change(rt_device_dw_t device, rt_dw_vicon_t vicon, 
 	
 	return RT_EOK;
 }
-
-extern struct rt_device_dw dw_device;
-rt_err_t change_value(rt_uint16_t addr, rt_uint16_t value)
-{
-	rt_dw_write_var_space(&dw_device, addr, 1, &value);
-	
-	return RT_EOK;
-}
-#if defined(RT_USING_FINSH) && defined(RT_USING_DW_DEBUG)
-MSH_CMD_EXPORT_ALIAS(change_value, dwin_cv, change icon value);
-FINSH_FUNCTION_EXPORT_ALIAS(change_value, dwin_cv, change icon value);
-#endif
