@@ -47,10 +47,10 @@ int rt_dw_plugins_login_init(
     rt_uint16_t login_flag_value, 
     rt_uint16_t exit_flag_value,
     rt_uint32_t root_password,
-	void (*login_ok)(rt_device_dw_t device),
-	void (*login_error)(rt_device_dw_t device),
-	void (*exit)(rt_device_dw_t device));
-	
+    void (*login_ok)(rt_device_dw_t device),
+    void (*login_error)(rt_device_dw_t device),
+    void (*exit)(rt_device_dw_t device));
+
 /* 添加用户密码 */
 rt_err_t rt_dw_plugins_login_add(rt_uint32_t password);
 
