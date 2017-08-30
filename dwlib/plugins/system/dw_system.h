@@ -35,7 +35,7 @@ rt_err_t rt_dw_set_now_bl(rt_device_dw_t device, rt_uint8_t now_bl);
 rt_err_t rt_dw_beep_nx10ms(rt_device_dw_t device, rt_uint8_t time);
 
 /* 获取当前页 */
-rt_uint16_t rt_dw_get_now_pageid(rt_device_dw_t device);	
+rt_uint16_t rt_dw_get_now_pageid(rt_device_dw_t device);
 
 /* 跳转到指定页面, 但是弹窗不会关闭, 所以在迪文屏幕有弹窗出现时, 不要调用该函数 */
 rt_err_t rt_dw_jump_page(rt_device_dw_t device, rt_uint16_t id);
@@ -85,7 +85,7 @@ rt_err_t rt_dw_get_buzzer_enable(rt_device_dw_t device, rt_uint8_t *enable);
 rt_err_t rt_dw_set_buzzer_enable(rt_device_dw_t device, rt_uint8_t enable);
 
 /* 获取RTC时间 */
-rt_err_t rt_dw_get_rtc(rt_device_dw_t device, 
+rt_err_t rt_dw_get_rtc(rt_device_dw_t device,
     rt_uint8_t *year, rt_uint8_t *month,  rt_uint8_t *day, 
     rt_uint8_t *hour, rt_uint8_t *minute, rt_uint8_t *seconds);
 
