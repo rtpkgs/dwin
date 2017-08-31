@@ -408,17 +408,13 @@ MSH_CMD_EXPORT_ALIAS       (get_rtc_timestamp, dwgtimestamp, get dwin timestamp)
 
 /* 添加用户密码, 注意要初始化login插件 */
 rt_err_t login_add(rt_uint32_t password)
-{
-	rt_err_t ret = RT_EOK;
-	
-	ret = rt_dw_plugins_login_add(password);
-	
-	if(ret == RT_EOK)
+{	
+	if(rt_dw_plugins_login_add(password) != RT_NULL)
 	{
 		rt_kprintf("[dwin] add login user succeed\n");
 	}
 	
-	return ret;
+	return RT_EOK;
 }
 FINSH_FUNCTION_EXPORT_ALIAS(login_add, dwadduser, add dwin login user);
 MSH_CMD_EXPORT_ALIAS       (login_add, dwadduser, add dwin login user);
@@ -464,7 +460,7 @@ MSH_CMD_EXPORT_ALIAS       (vicon_change, dwcgvicon, change dwin vicon);
 #endif
 
 /* 注册dwinlib cmd插件使用的设备句柄 */
-rt_uint8_t rt_dw_cmd_init(rt_device_dw_t device)
+rt_uint8_t rt_dw_plugins_cmd_init(rt_device_dw_t device)
 {
 	RT_ASSERT(device != RT_NULL);
 

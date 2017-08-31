@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 /* 注册dwinlib cmd插件使用的设备句柄 */
-rt_uint8_t rt_dw_cmd_init(rt_device_dw_t device);
+rt_uint8_t rt_dw_plugins_cmd_init(rt_device_dw_t device);
 
 #ifdef __cplusplus
 }

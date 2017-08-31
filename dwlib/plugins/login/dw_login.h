@@ -52,7 +52,10 @@ int rt_dw_plugins_login_init(
     void (*exit)(rt_device_dw_t device));
 
 /* 添加用户密码 */
-rt_err_t rt_dw_plugins_login_add(rt_uint32_t password);
+rt_dw_login_password_t *rt_dw_plugins_login_add(rt_uint32_t password);
+
+/* 删除用户密码 */
+rt_err_t rt_dw_plugins_login_del(rt_dw_login_password_t password);
 
 #ifdef __cplusplus
 }
