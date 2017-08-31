@@ -82,15 +82,17 @@ rt_uint16_t rt_dw_get_now_pageid(rt_device_dw_t device)
 
     RT_ASSERT(device != RT_NULL);
 
+	RT_DW_CRITICAL_START();
     ret = rt_dw_read_reg_space(device, RT_DW_REG_03H_002_NOW_PAGEID, 2, id_temp);
+	RT_DW_CRITICAL_END();
 
     if(ret != RT_EOK)
     {
         /* 读寄存器空间错误 */
-        return 0;
+        return 0xffff;
     }
-
-    return (rt_uint16_t)(id_temp[0] << 8) + id_temp[1];
+	
+    return (rt_uint16_t)((id_temp[0] << 8) + id_temp[1]);
 }
 
 /* 跳转到指定页面, 但是弹窗不会关闭, 所以在迪文屏幕有弹窗出现时, 不要调用该函数 */
