@@ -84,6 +84,8 @@ rt_err_t rt_device_dw_init(rt_device_dw_t device, const char *name, rt_uint8_t i
 	{
 		rt_uint8_t rx_data[10] = {0};
 		
+		rt_kprintf("\n");
+		
 		/* 打印固件版本 */
 		rx_data[0] = rt_dw_fw_version(device);
 		rt_kprintf("[dwin]firmware version 0x%.2x\n", rx_data[0]);
@@ -162,10 +164,6 @@ rt_err_t rt_device_dw_init(rt_device_dw_t device, const char *name, rt_uint8_t i
 		/* 获取RTC时间戳 */
 		rt_dw_get_rtc_timestamp(device, (time_t *)rx_data);
 		rt_kprintf("[dwin]now timestamp %ld\n", *(time_t *)rx_data);
-		
-		#if defined(RT_USING_DW_CMD)
-			rt_dw_cmd_init(device);
-		#endif
 	}	
 #endif
 		
