@@ -22,8 +22,8 @@
 以下是开启这些插件的宏开关：
 ~~~
 1. 系统插件			RT_USING_DW_SYSTEM
-2. 登陆插件			RT_USING_DW_LOGIN
-3. 变量图标插件		RT_USING_DW_VICON
+2. 登陆插件        RT_USING_DW_LOGIN
+3. 变量图标        RT_USING_DW_VICON
 4. 命令插件			RT_USING_DW_CMD
 ~~~
 
