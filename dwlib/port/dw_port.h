@@ -4,9 +4,6 @@
 /* dwlib common header file */
 #include "dw_common.h" 
 
-#define DW_MALLOC     rt_malloc
-#define DW_FREE       rt_free
-
 /* Port API */
 bool dw_port_serial_init(const char *name, uint32_t baudrate);
 bool dw_port_serial_putc(char  byte);
