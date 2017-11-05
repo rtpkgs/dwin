@@ -1,6 +1,7 @@
 #ifndef __SW_SPACE_MANGER_H_ 
 #define __SW_SPACE_MANGER_H_ 
 
+#include "dw_common.h"
 #include "dw_conf.h"
 
 typedef struct dw_space_block
