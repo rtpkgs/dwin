@@ -1,7 +1,13 @@
 #ifndef __SW_CONF_H_ 
 #define __SW_CONF_H_ 
 
-#include "dw_port.h"
+/* ÷°Õ∑≈‰÷√ */
+#if !defined(DW_FRAME_HBYTE) 
+#define DW_FRAME_HBYTE (0x5a)
+#endif
+#if !defined(DW_FRAME_LBYTE) 
+#define DW_FRAME_LBYTE (0xa5)
+#endif
 
 /* ƒ⁄¥Ê∑÷≈‰ */
 #if !defined(DW_MALLOC) 
