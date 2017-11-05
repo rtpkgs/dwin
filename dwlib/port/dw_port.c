@@ -70,12 +70,12 @@ bool dw_port_serial_resource_init(void)
     return true;
 }
 
-/* 带超时时间获取串口资源锁 */
-bool dw_port_serial_resource_take(int32_t timeout)
+/* 获取串口资源锁 */
+bool dw_port_serial_resource_take(void)
 {
     rt_err_t ret = RT_ERROR;
     
-    ret = rt_sem_take(&serial_res, timeout);
+    ret = rt_sem_take(&serial_res, RT_WAITING_FOREVER);
     if(ret != RT_EOK)
     {
         return false;
