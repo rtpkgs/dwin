@@ -2,7 +2,7 @@
 
 **Currently, the framework is optimized and adapted to rt-thread3.0.**
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+[![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
 [![release](https://img.shields.io/badge/Release-v1.1.0(alpha)-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 [![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
 [![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
@@ -28,7 +28,7 @@ To write...
 
 **目前, 正在优化框架并适配RT-Thread3.0中.**
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+[![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
 [![release](https://img.shields.io/badge/Release-v1.1.0(alpha)-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 [![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
 [![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
