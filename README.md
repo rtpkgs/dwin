@@ -4,8 +4,8 @@
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![release](https://img.shields.io/badge/Release-v1.1.0(alpha)-orange.svg)](https://github.com/liu2guang/dwlib/releases)
-[![license](https://img.shields.io/badge/license-MIT-000000.svg)]()
-[![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)]()
+[![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
+[![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
 
 The dwlib(Dwin Event Processing Library for C-Language) is the open source dw display event processing library, It supports the **`ENV`** development environment for RT-Thread3.0. Users can configure libraries directly in **`menuconfig`**. The dwlib supports highly clipping characteristics.
 
@@ -30,8 +30,8 @@ To write...
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![release](https://img.shields.io/badge/Release-v1.1.0(alpha)-orange.svg)](https://github.com/liu2guang/dwlib/releases)
-[![license](https://img.shields.io/badge/license-MIT-000000.svg)]()
-[![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)]()
+[![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
+[![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
 
 显示屏模块购买地址：[迪文显示屏官方淘宝店](https://dwinhmi.taobao.com/index.htm?spm=2013.1.w5002-14432573301.2.6f6a88bfvHBSBF "[淘宝]").
 
