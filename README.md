@@ -22,7 +22,7 @@ To write...
 [![license](https://img.shields.io/badge/license-MIT-000000.svg)]()
 [![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)]()
 
-Dwlib(Dwin显示屏事件处理库 for C语言) 是开源的迪文显示屏事件处理库, 它支持RT-Thread3.0的**`ENV`**开发环境. 用户可以使用**`menuconfig`**工具配置库. 同时Dwlib支持高度裁剪特性.
+Dwlib(Dwin显示屏事件处理库 for C语言) 是开源的迪文显示屏事件处理库, 它支持RT-Thread3.0的 **`ENV`** 开发环境. 用户可以使用 **`menuconfig`** 工具配置库. 同时Dwlib支持高度裁剪特性.
 
 ## 简介 ##
 待编写...
