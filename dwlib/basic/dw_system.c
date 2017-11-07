@@ -283,3 +283,190 @@ bool dw_set_screen_dir(uint16_t dir)
     
     return true;
 }
+
+/* 触摸控制背光 */
+bool dw_touch_blacklight_enable(bool enable)
+{
+    bool ret = false;
+    uint8_t buffer[1] = {0};
+    
+    /* 读取R2值 */
+    ret = dw_read_reg(DW_REG_ADDR_R2, buffer, 1);
+    if(ret == false)
+    {
+        return false;
+    }
+    
+    /* 处理R2数据 */
+    if(enable == true)
+    {
+        DW_BITS_SET(buffer[0], DW_BITx(6));
+    }
+    else if(enable == false)
+    {
+        DW_BITS_CLR(buffer[0], DW_BITx(6));
+    }
+    else
+    {
+        return false;
+    }
+    
+    ret = dw_write_reg(DW_REG_ADDR_R2, buffer, 1);
+    if(ret == false)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+/* 设置触摸数据自动上传, 只支持关闭 */
+bool dw_touch_data_update_enable(bool enable)
+{
+    bool ret = false;
+    uint8_t buffer[1] = {0};
+    
+    /* 读取R2值 */
+    ret = dw_read_reg(DW_REG_ADDR_R2, buffer, 1);
+    if(ret == false)
+    {
+        return false;
+    }
+    
+    /* 处理R2数据 */
+    if(enable == true)
+    {
+        dw_print("not support enable touch data update\n");
+        return false;
+    }
+    
+    DW_BITS_CLR(buffer[0], DW_BITx(4));
+    
+    ret = dw_write_reg(DW_REG_ADDR_R2, buffer, 1);
+    if(ret == false)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+/* 加载L22字库 */
+bool dw_l22_mode_init(void)
+{
+    bool ret = false;
+    uint8_t buffer[1] = {0};
+    
+    /* 读取R2值 */
+    ret = dw_read_reg(DW_REG_ADDR_R2, buffer, 1);
+    if(ret == false)
+    {
+        return false;
+    }
+    
+    /* 处理R2数据 */
+    DW_BITS_SET(buffer[0], DW_BITx(4));
+    
+    ret = dw_write_reg(DW_REG_ADDR_R2, buffer, 1);
+    if(ret == false)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+/* 设置蜂鸣器使能 */
+bool dw_touch_beep_enable(bool enable)
+{
+    bool ret = false;
+    uint8_t buffer[1] = {0};
+    
+    /* 读取R2值 */
+    ret = dw_read_reg(DW_REG_ADDR_R2, buffer, 1);
+    if(ret == false)
+    {
+        return false;
+    }
+    
+    /* 处理R2数据 */
+    if(enable == true)
+    {
+        DW_BITS_CLR(buffer[0], DW_BITx(1));
+    }
+    else if(enable == false)
+    {
+        DW_BITS_SET(buffer[0], DW_BITx(1));
+    }
+    else
+    {
+        return false;
+    }
+    
+    ret = dw_write_reg(DW_REG_ADDR_R2, buffer, 1);
+    if(ret == false)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+bool dw_get_time(struct dw_time *time)
+{
+    bool ret = false;
+    uint8_t date_and_time[7] = {0};
+
+    ret = dw_read_reg(DW_REG_ADDR_R_TIME, date_and_time, 7);
+    if(ret != true)
+    {
+        /* 写寄存器空间错误 */
+        return ret;
+    }
+
+    /* 传入数据到函数入口 */
+    time->year    = dw_bcd2int(date_and_time[0]) + 2000;
+    time->month   = dw_bcd2int(date_and_time[1]);
+    time->day     = dw_bcd2int(date_and_time[2]);
+    time->hour    = dw_bcd2int(date_and_time[4]);
+    time->minute  = dw_bcd2int(date_and_time[5]);
+    time->seconds = dw_bcd2int(date_and_time[6]);
+
+    return true;
+}
+
+bool dw_set_time(struct dw_time time)
+{
+    bool ret = false;
+    uint8_t date_and_time[8];
+
+    /* 真正的RTC地址为0x20, 但是修改了RTC需要在0x1F处
+       写0x5a表明用户修改了RTC数据, 迪文屏幕在修改系
+       RTC后会自动清零 */
+    date_and_time[0] = 0x5a;
+    date_and_time[1] = dw_int2bcd(time.year-2000);
+    date_and_time[2] = dw_int2bcd(time.month);
+    date_and_time[3] = dw_int2bcd(time.day);
+    date_and_time[4] = 0x00;                    /* 周几, 可以随便设定 */
+    date_and_time[5] = dw_int2bcd(time.hour);
+    date_and_time[6] = dw_int2bcd(time.minute);
+    date_and_time[7] = dw_int2bcd(time.seconds);
+
+    ret = dw_write_reg(DW_REG_ADDR_W_TIME, date_and_time, 8);
+    if(ret == false)
+    {
+        return false;
+    }
+
+    return RT_EOK;
+}
+
+bool dw_get_timestamp(uint32_t *timestamp)
+{
+    return true;
+}
+
+bool dw_set_timestamp(uint32_t timestamp)
+{
+    return true;
+}
