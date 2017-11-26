@@ -48,14 +48,23 @@
 
 /* 空间变量名 */
 #if !defined(PKG_DWLIB_SM_NAME_LENGTH) 
-    #define PKG_DWLIB_SM_NAME_LENGTH (8)
+    #define PKG_DWLIB_SM_NAME_LENGTH    (12)
 #endif
     
 /* 空间变量最大地址(字节) */
 #if !defined(PKG_DWLIB_SM_SPACE_MAXSIZE) 
-    #define PKG_DWLIB_SM_SPACE_MAXSIZE (4096)
+    #define PKG_DWLIB_SM_SPACE_MAXSIZE  (4096)
 #endif
 
-#endif
+#endif /* PKG_DWLIB_ENABLE_SM */
+
+/* dwlib库按键插件 */
+#if defined(PKG_DWLIB_ENABLE_BUTTON) 
+
+#if !defined(PKG_DWLIB_BTN_NAME_LENGTH) 
+    #define PKG_DWLIB_BTN_NAME_LENGTH   (12)
+#endif 
+
+#endif /* PKG_DWLIB_ENABLE_BUTTON */
 
 #endif
