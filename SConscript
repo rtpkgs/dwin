@@ -24,6 +24,11 @@ if GetDepend(['PKG_DWLIB_ENABLE_SM']):
     inc = inc + [cwd + '/dwlib/plugins/spacemanager']
     src = src + ['./dwlib/plugins/spacemanager/dw_space_manager.c']
 
+# add dwlib plugins button
+if GetDepend(['PKG_DWLIB_ENABLE_BUTTON']):
+    inc = inc + [cwd + '/dwlib/plugins/button']
+    src = src + ['./dwlib/plugins/button/dw_button.c']
+
 # add group to IDE project
 group = DefineGroup('dwlib', src, depend = ['PKG_USING_DWLIB'], CPPPATH = inc)
 
