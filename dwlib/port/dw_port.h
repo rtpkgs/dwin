@@ -9,7 +9,7 @@ bool dw_port_serial_init(const char *name, uint32_t baudrate);
 bool dw_port_serial_putc(char  byte);
 bool dw_port_serial_getc(char *byte);
 bool dw_port_serial_resource_init(void);
-bool dw_port_serial_resource_take(void);
-bool dw_port_serial_resource_release(void);
+bool dw_port_serial_lock(void);
+bool dw_port_serial_unlock(void);
 
 #endif

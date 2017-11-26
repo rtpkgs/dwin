@@ -61,7 +61,7 @@ bool dw_port_serial_resource_init(void)
 {
     rt_err_t ret = RT_ERROR;
     
-    ret = rt_sem_init(&serial_res, "dw res", 0x01 , RT_IPC_FLAG_PRIO);
+    ret = rt_sem_init(&serial_res, "dw_res", 0x01 , RT_IPC_FLAG_PRIO);
     if(ret != RT_EOK)
     {
         return false;
@@ -70,8 +70,8 @@ bool dw_port_serial_resource_init(void)
     return true;
 }
 
-/* 获取串口资源锁 */
-bool dw_port_serial_resource_take(void)
+/* 锁串口 */
+bool dw_port_serial_lock(void)
 {
     rt_err_t ret = RT_ERROR;
     
@@ -84,8 +84,8 @@ bool dw_port_serial_resource_take(void)
     return true;
 }
 
-/* 释放串口资源锁 */
-bool dw_port_serial_resource_release(void)
+/* 开锁串口 */
+bool dw_port_serial_unlock(void)
 {
     rt_err_t ret = RT_ERROR;
     
