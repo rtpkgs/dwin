@@ -21,8 +21,8 @@
 /* Ö¸Áî */
 #define DW_REG_W_CMD    (0x80)
 #define DW_REG_R_CMD    (0x81)
-#define DW_SPACE_W_CMD  (0x82)
-#define DW_SPACE_R_CMD  (0x83)
+#define DW_VAL_W_CMD    (0x82)
+#define DW_VAL_R_CMD    (0x83)
 
 /* Î»²Ù×÷ */
 #define DW_BITx(n) (1 << ((n)-1))
