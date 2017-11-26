@@ -28,6 +28,11 @@ typedef struct dw_time
 #define DW_REG_ADDR_R_TIME              (0x20)
 
 /* system api */
+bool dw_read_reg(uint8_t addr, uint8_t *buffer, uint8_t length);
+bool dw_write_reg(uint8_t addr, uint8_t *buffer, uint8_t length);
+bool dw_read_val(uint16_t addr, uint16_t *buffer, uint16_t length);
+bool dw_write_val(uint16_t addr, uint16_t *buffer, uint16_t length);
+
 bool dw_hard_version(uint8_t *version, uint8_t *subversion);
 bool dw_soft_version(uint8_t *version, uint8_t *subversion, uint8_t *revision);
 

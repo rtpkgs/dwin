@@ -14,7 +14,7 @@ static uint8_t dw_int2bcd(uint8_t dec)
 }
 
 /* 读寄存器 */
-static bool dw_read_reg(uint8_t addr, uint8_t *buffer, uint8_t length)
+bool dw_read_reg(uint8_t addr, uint8_t *buffer, uint8_t length)
 {
     uint8_t c;
     uint8_t index = 0;
@@ -40,14 +40,14 @@ static bool dw_read_reg(uint8_t addr, uint8_t *buffer, uint8_t length)
     txbuffer[5] = length;
     
     /* 获取串口资源 */
-    dw_port_serial_resource_take();
+    dw_port_serial_lock();
     
     /* 发送数据 */
     for(index = 0; index < 6; index++)
     {
         if(dw_port_serial_putc((char)txbuffer[index]) == false)
         {
-            dw_port_serial_resource_release();
+            dw_port_serial_unlock();
             return false;
         }
     }
@@ -70,7 +70,7 @@ static bool dw_read_reg(uint8_t addr, uint8_t *buffer, uint8_t length)
        (rxbuffer[4] != addr          ) ||
        (rxbuffer[5] != length        ))
     {
-        dw_port_serial_resource_release();
+        dw_port_serial_unlock();
         return false;
     }
     
@@ -80,13 +80,13 @@ static bool dw_read_reg(uint8_t addr, uint8_t *buffer, uint8_t length)
     }
     
     /* 释放串口资源 */
-    dw_port_serial_resource_release();
+    dw_port_serial_unlock();
     
     return true;
 }
 
 /* 写寄存器 */
-static bool dw_write_reg(uint8_t addr, uint8_t *buffer, uint8_t length)
+bool dw_write_reg(uint8_t addr, uint8_t *buffer, uint8_t length)
 {
     uint8_t index = 0;
     static uint8_t txbuffer[256] = 
@@ -114,20 +114,145 @@ static bool dw_write_reg(uint8_t addr, uint8_t *buffer, uint8_t length)
     }
     
     /* 获取串口资源 */
-    dw_port_serial_resource_take();
+    dw_port_serial_lock();
     
     /* 写寄存器 */
     for(index = 0; index < (length + 5); index++)
     {
         if(dw_port_serial_putc((char)txbuffer[index]) == false)
         {
-            dw_port_serial_resource_release();
+            dw_port_serial_unlock();
             return false;
         }
     }
     
     /* 释放串口资源 */
-    dw_port_serial_resource_release();
+    dw_port_serial_unlock();
+    
+    return true;
+}
+
+/* 读变量地址 */
+bool dw_read_val(uint16_t addr, uint16_t *buffer, uint16_t length)
+{
+    uint8_t c;
+    uint8_t index = 0;
+    static uint8_t rxbuffer[512] = {0};
+    static uint8_t txbuffer[  7] = 
+    {
+        DW_FRAME_HBYTE,     /* 通信帧头高字节     offset 0 */
+        DW_FRAME_LBYTE,     /* 通信帧头低字节     offset 1 */
+        4,                  /* 通信数据长度       offset 2 */
+        DW_VAL_R_CMD,       /* 读寄存器指令       offset 3 */
+        0,                  /* 读寄存器地址高地址 offset 4 */
+        0,                  /* 读寄存器地址低地址 offset 5 */
+        0                   /* 读寄存器长度       offset 6 */
+    };
+    
+    /* 参数检查, 库编写阶段使用, 编写完成后可以删除 */
+    if((buffer == NULL) || (length == 0))
+    {
+        return false;
+    }
+    
+    /* 修改rxbuffer */
+    txbuffer[4] = (addr & 0xFF00) >> 8; /* 高字节 */
+    txbuffer[5] = (addr & 0x00FF) >> 0; /* 低字节 */
+    txbuffer[6] = length;
+    
+    /* 获取串口资源 */
+    dw_port_serial_lock();
+    
+    /* 发送数据 */
+    for(index = 0; index < 7; index++)
+    {
+        if(dw_port_serial_putc((char)txbuffer[index]) == false)
+        {
+            dw_port_serial_unlock();
+            return false;
+        }
+    }
+    
+    /* 等待接收指定长度的数据 */
+    index = 0;
+    while(index != (length*2 + 7))
+    {
+        if(dw_port_serial_getc((char *)&c) == true)
+        {
+            rxbuffer[index++] = c;
+        }
+    }
+    
+    /* 处理数据 */
+    if((rxbuffer[0] != DW_FRAME_HBYTE      ) || 
+       (rxbuffer[1] != DW_FRAME_LBYTE      ) || 
+       (rxbuffer[2] != length*2 + 4        ) || 
+       (rxbuffer[3] != DW_VAL_R_CMD        ) || 
+       (rxbuffer[4] != (addr & 0xFF00) >> 8) ||
+       (rxbuffer[5] != (addr & 0x00FF) >> 0) ||
+       (rxbuffer[6] != length              ))
+    {
+        dw_port_serial_unlock();
+        return false;
+    }
+    
+    for(index = 0; index < length; index++)
+    {
+        buffer[index] = (rxbuffer[index*2+7] << 8) + rxbuffer[index*2+8];
+    }
+    
+    /* 释放串口资源 */
+    dw_port_serial_unlock();
+    
+    return true;
+}
+
+/* 写变量地址 */
+bool dw_write_val(uint16_t addr, uint16_t *buffer, uint16_t length)
+{
+    uint16_t index = 0;
+    static uint8_t txbuffer[256] = 
+    {
+        DW_FRAME_HBYTE,     /* 通信帧头高字节     offset 0 */
+        DW_FRAME_LBYTE,     /* 通信帧头低字节     offset 1 */
+        0,                  /* 通信数据长度       offset 2 */
+        DW_VAL_W_CMD,       /* 写寄存器指令       offset 3 */
+        0,                  /* 写寄存器地址高字节 offset 4 */
+        0                   /* 写寄存器地址低字节 offset 5  */
+    };
+    
+    /* 参数检查, 库编写阶段使用, 编写完成后可以删除 */
+    if((buffer == NULL) || (length == 0))
+    {
+        return false;
+    }
+    
+    /* 修改rxbuffer */
+    txbuffer[2] = length*2+3;
+    txbuffer[4] = (addr & 0xFF00) >> 8; /* 高字节 */
+    txbuffer[5] = (addr & 0x00FF) >> 0; /* 低字节 */
+    
+    for(index = 0; index < length; index++)
+    {
+        txbuffer[index*2+6] = (buffer[index] & 0xFF00) >> 8;  /* 高字节 */
+        txbuffer[index*2+7] = (buffer[index] & 0x00FF) >> 0;  /* 低字节 */
+    }
+    
+    /* 获取串口资源 */
+    dw_port_serial_lock();
+    
+    /* 写寄存器 */
+    for(index = 0; index < (length*2 + 6); index++)
+    {
+        if(dw_port_serial_putc((char)txbuffer[index]) == false)
+        {
+            dw_port_serial_unlock();
+            return false;
+        }
+    }
+    
+    /* 释放串口资源 */
+    dw_port_serial_unlock();
     
     return true;
 }
