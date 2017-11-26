@@ -10,9 +10,14 @@
 #include "dw_init.h"
 #include "dw_system.h"
 
-/* dwlib plugins function api */
+/* dwlib plugins sm function api */
 #if defined(PKG_DWLIB_ENABLE_SM)
 #include "dw_space_manager.h"
+#endif
+
+/* dwlib plugins function api */
+#if defined(PKG_DWLIB_ENABLE_BUTTON)
+#include "dw_button.h"
 #endif
 
 #endif
