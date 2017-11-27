@@ -67,4 +67,13 @@
 
 #endif /* PKG_DWLIB_ENABLE_BUTTON */
 
+/* dwlib¿âÍ¼±ê²å¼þ */
+#if defined(PKG_DWLIB_ENABLE_ICON) 
+
+#if !defined(PKG_DWLIB_ICON_NAME_LENGTH) 
+    #define PKG_DWLIB_ICON_NAME_LENGTH   (12)
+#endif 
+
+#endif /* PKG_DWLIB_ICON_NAME_LENGTH */
+
 #endif

@@ -20,4 +20,9 @@
 #include "dw_button.h"
 #endif
 
+/* dwlib plugins function api */
+#if defined(PKG_DWLIB_ENABLE_ICON)
+#include "dw_icon.h"
+#endif
+
 #endif
