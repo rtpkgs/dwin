@@ -12,7 +12,7 @@ static list_t *btn_head_list = NULL;
 bool dw_plugin_button_init(void)
 {
     /* 申请2字节空间用于按键插件 */
-    btn_space = dw_plugin_sm_apply("btn_plugin", 2);
+    btn_space = dw_plugin_sm_apply("btn_plugin", 1);
     if(btn_space == NULL)
     {
         dw_print("button space apply failed");
