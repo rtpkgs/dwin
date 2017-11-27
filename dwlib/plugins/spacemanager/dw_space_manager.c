@@ -85,10 +85,10 @@ void dw_plugin_sm_used_space(void)
     
     while((node = list_iterator_next(iterator)) != NULL)
     {
-        dw_print("<space name> = %s <addr> = 0x%.4x <size> = %d", 
-            ((struct dw_space_block *)(node->val))->name, 
+        dw_print("<addr> = 0x%.4x <size> = %d <space name> = %s", 
             ((struct dw_space_block *)(node->val))->addr, 
-            ((struct dw_space_block *)(node->val))->size);
+            ((struct dw_space_block *)(node->val))->size, 
+            ((struct dw_space_block *)(node->val))->name);
     }
     
     dw_print("current space addr = 0x%.4x, used space size = %dByte, free space size = %dByte", 
