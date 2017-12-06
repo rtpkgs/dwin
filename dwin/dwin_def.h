@@ -1,58 +1,64 @@
 #ifndef __DWIN_DEF_H_ 
 #define __DWIN_DEF_H_ 
 
-#include "dwin_cfg.h"
-#include "stdint.h"
+#include "rtthread.h"
 
-#define DWIN_DATA_MAX_BYTE  (246)
+#define DWIN_DEBUG
 
-/* ´íÎóÂë */
-typedef enum
-{
-    dwin_err_none = 0,
-    dwin_err_error,
-    dwin_err_timeout,
-    dwin_err_nosys,
-    dwin_err_epara
-} dwin_err_t; 
+/* dwin config */
+/* transport framehead high byte */
+#ifndef PKG_DWIN_HEAD_H
+#define PKG_DWIN_HEAD_H (0x5A)
+#endif
+#ifndef PKG_DWIN_HEAD_L
+#define PKG_DWIN_HEAD_L (0xA5)
+#endif
 
-/* ¼Ä´æÆ÷Êý¾ÝÖ¡ */
-struct dwin_reg
-{
-    uint8_t head1;
-    uint8_t head2;
-    uint8_t length;
-    uint8_t cmd;
-    uint8_t data[DWIN_DATA_MAX_BYTE];
-}; 
-typedef union 
-{
-    struct dwin_reg reg;
-    uint8_t sendbuffer[sizeof(struct dwin_reg)]; 
-} *dwin_reg_t;
+/* transport framehead low byte */
+#ifndef PKG_DWIN_VAR_MAX_BYTE
+#define PKG_DWIN_VAR_MAX_BYTE   (4096)
+#endif
 
-/* ±äÁ¿Êý¾ÝÖ¡ */
-struct dwin_var
-{
-    uint8_t head1;
-    uint8_t head2;
-    uint8_t length;
-    uint8_t cmd;
-    uint16_t data[DWIN_DATA_MAX_BYTE/2];
-};
-typedef union 
-{
-    struct dwin_var var;
-    uint8_t sendbuffer[sizeof(struct dwin_var)]; 
-} *dwin_var_t;
+/* dwin prompt */
+#ifndef PKG_DWIN_PROMPT
+#define PKG_DWIN_PROMPT     "[dwin]"
+#endif
 
-/* ¶ÏÑÔ */
-#define dwin_assert(ex)                                                        \
-{                                                                              \
-    if(!(ex))                                                                  \
-    {                                                                          \
-        dwin_print("(%s,%s,%d) assert fail\n", #ex, __FUNCTION__, __LINE__);   \
-    }                                                                          \
+/* dwin watch thread priority */
+#ifndef PKG_DWIN_WATCH_PRIO
+#define PKG_DWIN_WATCH_PRIO (10)
+#endif
+
+/* dwin macro */
+/* read and write reg/var cmd */
+#define DWIN_REG_READ   (0x80) 
+#define DWIN_REG_WRITE  (0x81) 
+#define DWIN_VAR_READ   (0x82) 
+#define DWIN_VAR_WRITE  (0x83) 
+
+/* dwin debug */
+#ifndef DWIN_DEBUG
+#define dwin_print(...) 
+#define dwin_println(...) 
+#else
+#define dwin_print(...)             \
+{                                   \
+    rt_kprintf(__VA_ARGS__);        \
 }
+#define dwin_println(...)           \
+{                                   \
+    rt_kprintf(PKG_DWIN_PROMPT);    \
+    rt_kprintf(__VA_ARGS__);        \
+    rt_kprintf("\n");               \
+}
+#endif
+
+/* type define */
+/* error code */
+typedef enum{
+    dwin_err_none = 0, 
+    dwin_err_error, 
+    dwin_err_timeout
+} dwin_err_t;
 
 #endif
