@@ -1,8 +1,8 @@
 # Dwin Event Processing Library for C-Language #
 
-**Currently, the framework is optimized and adapted to rt-thread3.0.**
+**Currently, Optimize the underlying framework，Please wait for 1.3.0 release**
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
+[![build](https://img.shields.io/badge/build-failed-red.svg)](https://github.com/liu2guang/dwlib)
 [![release](https://img.shields.io/badge/Release-v1.2.0-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 [![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
 [![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
@@ -26,7 +26,7 @@ To write...
 
 # Dwin显示屏事件处理库 for C语言 #
 
-**目前, 正在优化框架并适配RT-Thread3.0中.**
+**目前, 优化底层框架中.请等待1.3.0发布**
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
 [![release](https://img.shields.io/badge/Release-v1.2.0-orange.svg)](https://github.com/liu2guang/dwlib/releases)
