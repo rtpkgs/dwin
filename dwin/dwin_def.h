@@ -16,12 +16,12 @@
 
 /* transport framehead low byte */
 #ifndef PKG_DWIN_VAR_MAX_BYTE
-#define PKG_DWIN_VAR_MAX_BYTE   (4096)
+#define PKG_DWIN_VAR_MAX_BYTE (4096)
 #endif
 
 /* dwin prompt */
 #ifndef PKG_DWIN_PROMPT
-#define PKG_DWIN_PROMPT     "[dwin]"
+#define PKG_DWIN_PROMPT "[dwin]"
 #endif
 
 /* dwin watch thread priority */
@@ -29,12 +29,17 @@
 #define PKG_DWIN_WATCH_PRIO (10)
 #endif
 
+/* dwin read reg and var min timeout */
+#ifndef PKG_DWIN_MIN_TIMEOUT
+#define PKG_DWIN_MIN_TIMEOUT (100)
+#endif
+
 /* dwin macro */
 /* read and write reg/var cmd */
-#define DWIN_REG_READ   (0x80) 
-#define DWIN_REG_WRITE  (0x81) 
-#define DWIN_VAR_READ   (0x82) 
-#define DWIN_VAR_WRITE  (0x83) 
+#define DWIN_REG_READ   (0x81) 
+#define DWIN_REG_WRITE  (0x80) 
+#define DWIN_VAR_READ   (0x83) 
+#define DWIN_VAR_WRITE  (0x82) 
 
 /* dwin debug */
 #ifndef DWIN_DEBUG

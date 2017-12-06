@@ -96,7 +96,8 @@ void dwin_autoupload_watch(void *p)
             state = STATE_GET_DATA;
             
 #ifdef DWIN_DEBUG
-            dwin_println(" auto upload len is %d Byte", ch);
+            dwin_print(PKG_DWIN_PROMPT);
+            dwin_print("auto upload [%dByte]:", ch);
 #endif
         }
         
@@ -120,7 +121,7 @@ void dwin_autoupload_watch(void *p)
                     {
                         dwin_print("0x%.2x ", data[i]);
                     }
-                    dwin_print("\b}");
+                    dwin_print("\b}\n");
                 }
 #endif
                 
@@ -204,6 +205,219 @@ uint8_t dwin_watch_stop(void)
     if(ret != RT_EOK)
     {
         dwin_println("dwin auto upload thread delete failed"); 
+        return dwin_err_error; 
+    }
+    
+    return dwin_err_none;
+}
+
+/* dwin var space write api */
+uint8_t dwin_var_write(uint16_t addr, uint16_t *data, uint8_t len)
+{
+    uint8_t index;
+    
+    RT_ASSERT(data != RT_NULL);
+    RT_ASSERT(len  != 0);
+    
+    dwin_putc(PKG_DWIN_HEAD_H);
+    dwin_putc(PKG_DWIN_HEAD_L);
+    dwin_putc((len*2) + 3);
+    dwin_putc(DWIN_VAR_WRITE);
+    dwin_putc((addr & 0xFF00) >> 8);
+    dwin_putc((addr & 0x00FF) >> 0);
+    
+    /* send data to dwin */
+    for(index = 0; index < len; index++)
+    {
+        dwin_putc((data[index] & 0xFF00) >> 8);
+        dwin_putc((data[index] & 0x00FF) >> 0);
+    }
+    
+#ifdef DWIN_DEBUG
+    {
+        uint8_t i;
+        
+        dwin_print(PKG_DWIN_PROMPT);
+        dwin_print("write [0x%.4x] var [%dbyte]:", addr, len*2);
+    
+        dwin_print("{");
+        for(i = 0; i < len; i++)
+        {
+            dwin_print("0x%.4x ", data[i]);
+        }
+        dwin_print("\b}\n");
+    }
+#endif
+    
+    return dwin_err_none;
+}
+
+uint8_t dwin_var_read(uint16_t addr, uint16_t *data, uint8_t len)
+{
+    uint8_t index = 0;
+    uint8_t rx_data[256] = {0};
+    uint8_t ret = dwin_err_none;
+
+    /* stop watch thread */
+    ret = dwin_watch_stop();
+    if(ret != dwin_err_none)
+    {
+        return dwin_err_error; 
+    }
+    
+    /* send read var request */
+    dwin_putc(PKG_DWIN_HEAD_H);
+    dwin_putc(PKG_DWIN_HEAD_L);
+    dwin_putc(4);
+    dwin_putc(DWIN_VAR_READ);
+    dwin_putc((addr & 0xFF00) >> 8);
+    dwin_putc((addr & 0x00FF) >> 0);
+    dwin_putc(len);
+    
+    for(;;)
+    {
+        rx_data[index++] = dwin_getc();
+        
+        if(index == (len*2+7))
+        {
+            /* rx_data is ok? */
+            if((rx_data[0] != PKG_DWIN_HEAD_H)  || (rx_data[1] != PKG_DWIN_HEAD_L)  || 
+               (rx_data[2] != (len*2+4))        || (rx_data[3] != DWIN_VAR_READ)    || 
+               (rx_data[4] != (addr&0xFF00)>>8) || (rx_data[5] != (addr&0x00FF)>>0) ||
+               (rx_data[6] != len))
+            {
+                ret = dwin_err_error;
+                rt_memset(data, 0, len*2+7);
+                break;
+            }
+            
+            /* u8 to u16 */
+            for(index = 7; index < (len*2+7); index+=2)
+            {
+                data[(index-7)/2] = (rx_data[index]<<8) + rx_data[index + 1];
+            }
+            
+            ret = dwin_err_none;
+            break;
+        }
+    }
+    
+    /* read var space debug */
+#ifdef DWIN_DEBUG
+    dwin_print(PKG_DWIN_PROMPT);
+    dwin_print("user readvar [%dByte]:{", len);
+    for(index = 0; index < (len*2+7); index++)
+    {
+        dwin_print("0x%.2x ", rx_data[index]);
+    }
+    dwin_print("\b}\n");
+#endif
+    
+    /* start watch thread */
+    ret = dwin_watch_start();
+    if(ret != dwin_err_none)
+    {
+        return dwin_err_error; 
+    }
+    
+    return dwin_err_none;
+}
+
+uint8_t dwin_reg_write(uint8_t addr, uint8_t *data, uint8_t len)
+{
+    uint8_t index;
+    
+    RT_ASSERT(data != RT_NULL);
+    RT_ASSERT(len  != 0);
+    
+    dwin_putc(PKG_DWIN_HEAD_H);
+    dwin_putc(PKG_DWIN_HEAD_L);
+    dwin_putc(len + 2);
+    dwin_putc(DWIN_REG_WRITE);
+    dwin_putc(addr);
+    
+    /* send data to dwin */
+    for(index = 0; index < len; index++)
+    {
+        dwin_putc(data[index]);
+    }
+    
+#ifdef DWIN_DEBUG
+    {
+        uint8_t i;
+        
+        dwin_print(PKG_DWIN_PROMPT);
+        dwin_print("write [0x%.2x] reg [%dbyte]:", addr, len);
+    
+        dwin_print("{");
+        for(i = 0; i < len; i++)
+        {
+            dwin_print("0x%.2x ", data[i]);
+        }
+        dwin_print("\b}\n");
+    }
+#endif
+    
+    return dwin_err_none;
+}
+
+uint8_t dwin_reg_read(uint8_t addr, uint8_t *data, uint8_t len)
+{
+    uint8_t index = 0;
+    uint8_t rx_data[256] = {0};
+    uint8_t ret = dwin_err_none;
+    
+    /* stop watch thread */
+    ret = dwin_watch_stop();
+    if(ret != dwin_err_none)
+    {
+        return dwin_err_error; 
+    }
+    
+    /* send read var request */
+    dwin_putc(PKG_DWIN_HEAD_H);
+    dwin_putc(PKG_DWIN_HEAD_L);
+    dwin_putc(3);
+    dwin_putc(DWIN_REG_READ);
+    dwin_putc(addr);
+    dwin_putc(len);
+    
+    for(;;)
+    {
+        rx_data[index++] = dwin_getc();
+        
+        if(index == (len+6))
+        {
+            /* rx_data is ok? */
+            if((rx_data[0] != PKG_DWIN_HEAD_H) || (rx_data[1] != PKG_DWIN_HEAD_L) || 
+               (rx_data[2] != (len+3))         || (rx_data[3] != DWIN_REG_READ)   || 
+               (rx_data[4] != addr)            || (rx_data[5] != len))
+            {
+                ret = dwin_err_error;
+                rt_memset(rx_data, 0, len+6);
+                break;
+            }
+            
+            rt_memcpy(data, &rx_data[6], len);
+            ret = dwin_err_none;
+            break;
+        }
+    }
+    
+    /* read var space debug */
+#ifdef DWIN_DEBUG
+    dwin_print(PKG_DWIN_PROMPT);
+    dwin_print("user readreg [%dByte]:{", len);
+    for(index = 0; index < (len+6); index++)
+    {
+        dwin_print("0x%.2x ", rx_data[index]);
+    }
+    dwin_print("\b}\n");
+#endif
+    
+    ret = dwin_watch_start();
+    if(ret != dwin_err_none)
+    {
         return dwin_err_error; 
     }
     
