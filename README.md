@@ -1,9 +1,9 @@
 # Dwin Event Processing Library for C-Language #
 
-**Currently, Optimize the underlying framework，Please wait for 1.3.0 release**
+**Currently, Optimize the underlying framework，Please wait for 1.3.1 release**
 
-[![build](https://img.shields.io/badge/build-failed-red.svg)](https://github.com/liu2guang/dwlib)
-[![release](https://img.shields.io/badge/Release-v1.2.0-orange.svg)](https://github.com/liu2guang/dwlib/releases)
+[![build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/liu2guang/dwlib)
+[![release](https://img.shields.io/badge/Release-v1.3.0-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 [![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
 [![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
 
