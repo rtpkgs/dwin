@@ -1,7 +1,8 @@
 #include "dwin_transport.h"
 
 /* state enum */
-enum input_state{
+enum input_state
+{
     STATE_NORMAL = 0,
     STATE_DATA_HEAD_H,
     STATE_DATA_HEAD_L,
