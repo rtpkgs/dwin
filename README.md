@@ -7,7 +7,7 @@
 [![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
 [![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
 
-The dwlib(Dwin Event Processing Library for C-Language) is the open source dw display event processing library, It supports the **`ENV`** development environment for RT-Thread3.0. Users can configure libraries directly in **`menuconfig`**. The dwlib supports highly clipping characteristics.
+The dwin(Dwin Event Processing Library for C-Language) is the open source dw display event processing library, It supports the **`ENV`** development environment for RT-Thread3.0. Users can configure libraries directly in **`menuconfig`**. The dwin supports highly clipping characteristics.
 
 Display module purchase address:[DWIN Display Official Taobao Store](https://dwinhmi.taobao.com/index.htm?spm=2013.1.w5002-14432573301.2.6f6a88bfvHBSBF "[TaoBao]").
 
@@ -35,7 +35,7 @@ To write...
 
 显示屏模块购买地址：[迪文显示屏官方淘宝店](https://dwinhmi.taobao.com/index.htm?spm=2013.1.w5002-14432573301.2.6f6a88bfvHBSBF "[淘宝]").
 
-Dwlib(Dwin显示屏事件处理库 for C语言) 是开源的迪文显示屏事件处理库, 它支持RT-Thread3.0的 **`ENV`** 开发环境. 用户可以使用 **`menuconfig`** 工具配置库. 同时Dwlib支持高度裁剪特性.
+Dwin(Dwin显示屏事件处理库 for C语言) 是开源的迪文显示屏事件处理库, 它支持RT-Thread3.0的 **`ENV`** 开发环境. 用户可以使用 **`menuconfig`** 工具配置库. 同时Dwin支持高度裁剪特性.
 
 ## 简介 ##
 下列显示屏模块以及被测试: 
