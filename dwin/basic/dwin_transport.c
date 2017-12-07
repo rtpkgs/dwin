@@ -1,4 +1,5 @@
 #include "dwin_transport.h"
+#include "dwin_paser.h" 
 
 /* state enum */
 enum input_state
@@ -111,7 +112,7 @@ void dwin_autoupload_watch(void *p)
             if(index == data[2] + 3)
             {
                 /* data paser */
-                // dwin_paser(data, data[2]);
+                dwin_paser(data, data[2]);
                 
 #ifdef DWIN_DEBUG
                 {
@@ -185,7 +186,7 @@ uint8_t dwin_watch_start(void)
 {
     /* create auto upload watch thread */ 
     dwin_uart_watch = rt_thread_create("twatch", dwin_autoupload_watch,  
-        RT_NULL, 1024, PKG_DWIN_WATCH_PRIO, 10); 
+        RT_NULL, 2048, PKG_DWIN_WATCH_PRIO, 10); 
     if(dwin_uart_watch == RT_NULL) 
     {
         dwin_println("dwin auto upload thread create failed"); 
