@@ -1,8 +1,12 @@
 #include "dwin_space.h" 
 #include "stdbool.h" 
+#include "list.h"
+
+/* plugin include */
+#include "dwin_plugin_button.h" 
 
 /* static data interface */
-static list_t *dwin_space_list;
+list_t *dwin_space_list;
 static uint16_t idle_addr = 0x0000;
 
 /* extern api */
@@ -73,6 +77,7 @@ dwin_space_t dwin_space_alloc(const char *name, uint16_t len, uint8_t type)
 }
 
 /* for each used space */
+#ifdef DWIN_DEBUG
 void dwin_space_foreach(void)
 {
     list_node_t *node = RT_NULL;
@@ -91,17 +96,41 @@ void dwin_space_foreach(void)
     
     while((node = list_iterator_next(iterator)) != RT_NULL)
     {
-        dwin_print("<name> = %s,<addr> = 0x%.4x,<len> = %.6d,<type> = %.4d\n", 
+        dwin_print("<name> = %s,<addr> = 0x%.4x,<len> = %.6d", 
             ((dwin_space_t)(node->val))->name, 
             ((dwin_space_t)(node->val))->addr, 
-            ((dwin_space_t)(node->val))->len,
-            ((dwin_space_t)(node->val))->type);
+            ((dwin_space_t)(node->val))->len);
+        
+        /* 完善插件后需要对应插件打印对应信息 */
+        switch(((dwin_space_t)(node->val))->type)
+        {
+            /* button */
+            case dwin_type_button:
+            {
+                dwin_print(",<type> = button,<match_val> = 0x%.4x", 
+                ((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->match_value);
+                
+                if(((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->state == button_state_startup)
+                {
+                    dwin_print(",<state> = startup\n");
+                }
+                else
+                {
+                    dwin_print(",<state> = stop\n");
+                }
+            }
+            break;
+            
+            default:
+            break;
+        }
     }
 }
 
 #include "finsh.h"
 MSH_CMD_EXPORT_ALIAS(dwin_space_foreach, dsf, print used space);
 FINSH_FUNCTION_EXPORT_ALIAS(dwin_space_foreach, dsf, print used space);
+#endif
 
 /* get dwin space idle size */
 uint16_t dwin_space_idle(void)

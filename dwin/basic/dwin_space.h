@@ -2,7 +2,6 @@
 #define __DWIN_SPACE_H_ 
 
 #include "dwin_def.h" 
-#include "list.h"
 
 /* type define */
 /* space data struct */
@@ -31,7 +30,9 @@ enum plugin_type
 /* malloc dwin space */
 uint8_t         dwin_space_init     (void);
 dwin_space_t    dwin_space_alloc    (const char *name, uint16_t len, uint8_t type);
+#ifdef DWIN_DEBUG
 void            dwin_space_foreach  (void);
+#endif
 uint16_t        dwin_space_idle     (void);
 
 #endif
