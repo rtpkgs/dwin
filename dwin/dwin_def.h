@@ -29,9 +29,9 @@
 #define PKG_DWIN_WATCH_PRIO (10)
 #endif
 
-/* dwin read reg and var min timeout */
-#ifndef PKG_DWIN_MIN_TIMEOUT
-#define PKG_DWIN_MIN_TIMEOUT (100)
+/* dwin space name length */
+#ifndef PKG_DWIN_SPACE_NAME_LEN
+#define PKG_DWIN_SPACE_NAME_LEN (12)
 #endif
 
 /* dwin macro */
@@ -60,7 +60,8 @@
 
 /* type define */
 /* error code */
-typedef enum{
+typedef enum
+{
     dwin_err_none = 0, 
     dwin_err_error, 
     dwin_err_timeout
