@@ -34,6 +34,11 @@
 #define PKG_DWIN_SPACE_NAME_LEN (12)
 #endif
 
+/* 按键按下值 */
+#ifndef DWIN_BUTTON_PRESS_VALUE
+#define DWIN_BUTTON_PRESS_VALUE (0x0D0D)
+#endif
+
 /* dwin macro */
 /* read and write reg/var cmd */
 #define DWIN_REG_READ   (0x81) 
