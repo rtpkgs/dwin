@@ -1,11 +1,9 @@
 #include "dwin_plugin_button.h" 
 
-/* static macro definition */
-#define DWIN_BUTTON_SPACE_BYTE (1)
+/* 内部使用宏 */
+#define DWIN_BUTTON_SPACE_BYTE  (1)         /* 按键变量空间大小 */
 
-/* extern api */
-/* 按键插件初始化 */
-/* create button */
+/* 创建按键 */
 uint8_t dwin_plugin_button_create(const char *name, press_cb cb, void *args)
 {
     dwin_space_t  button_space;
@@ -32,10 +30,47 @@ uint8_t dwin_plugin_button_create(const char *name, press_cb cb, void *args)
     /* 填充结构体 */
     button_handle->args        = args;
     button_handle->press_cb    = cb;
-    button_handle->state       = button_state_startup;
-    button_handle->match_value = 0x0D0D;
+    button_handle->state       = button_press;
+    button_handle->match_value = DWIN_BUTTON_PRESS_VALUE;
     
     button_space ->plugin = (void *)button_handle;
+    
+    return dwin_err_none;
+}
+
+/* 修改按键模式 */
+uint8_t dwin_plugin_button_mode(const char *name, uint8_t mode)
+{
+    dwin_space_t space;
+    dwin_button_t button;
+    
+    space = dwin_space_find(name);
+    if(space == RT_NULL)
+    {
+        return dwin_err_error;
+    }
+    
+    button = (dwin_button_t)(space->plugin);
+    button->state = mode;
+    
+    return dwin_err_none;
+}
+
+/* 更新按键回调 */
+uint8_t dwin_plugin_button_update(const char*name, press_cb cb, void *p)
+{
+    dwin_space_t space;
+    dwin_button_t button;
+    
+    space = dwin_space_find(name);
+    if(space == RT_NULL)
+    {
+        return dwin_err_error;
+    }
+    
+    button = (dwin_button_t)(space->plugin);
+    button->args = p;
+    button->press_cb = cb;
     
     return dwin_err_none;
 }

@@ -3,7 +3,7 @@
 
 #include "dwin_space.h" 
 
-/* type define */
+/* 按键句柄 */
 typedef struct dwin_button
 {
     uint8_t state;
@@ -12,21 +12,19 @@ typedef struct dwin_button
     void *args;
 } *dwin_button_t; 
 
-/* button press callback func */
+/* 按下回调函数 */
 typedef void (*press_cb)(void *args);
 
-/* startup and stop */
+/* 按键模式 */
 enum button_state
 {
-    button_state_startup = 0,
-    button_state_stop
+    button_stop = 0,    /* 停止模式 */
+    button_press        /* 单击模式 */
 };
 
-/* extern api */
-uint8_t dwin_plugin_button_init(uint16_t addr);
+/* 外部函数 */
 uint8_t dwin_plugin_button_create(const char *name, press_cb cb, void *args);
-uint8_t dwin_plugin_button_startup(const char*name);
-uint8_t dwin_plugin_button_pause(const char*name);
+uint8_t dwin_plugin_button_mode(const char*name, uint8_t mode);
 uint8_t dwin_plugin_button_update(const char*name, press_cb cb, void *p);
 
 #endif
