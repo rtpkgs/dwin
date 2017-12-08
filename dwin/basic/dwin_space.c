@@ -4,6 +4,7 @@
 
 /* plugin include */
 #include "dwin_plugin_button.h" 
+#include "dwin_plugin_inputbox.h" 
 
 /* static data interface */
 list_t *dwin_space_list;
@@ -25,7 +26,7 @@ uint8_t dwin_space_init(void)
     dwin_space_list = list_new();
     if(dwin_space_list == RT_NULL)
     {
-        dwin_println("dwin space manger list new failed");
+        dwin_println("Dwin space manger list new failed");
         return dwin_err_error;
     }
     
@@ -47,7 +48,7 @@ dwin_space_t dwin_space_alloc(const char *name, uint16_t len, uint8_t type)
     /* Check if space is sufficient */
     if((len*2) > dwin_space_idle())
     {
-        dwin_println("dwin is no space, idle = ", dwin_space_idle());
+        dwin_println("Dwin is no space, idle = ", dwin_space_idle());
         return RT_NULL;
     }
     
@@ -55,7 +56,7 @@ dwin_space_t dwin_space_alloc(const char *name, uint16_t len, uint8_t type)
     space = (dwin_space_t)rt_malloc(sizeof(struct dwin_space));
     if(space == RT_NULL)
     {
-        dwin_println("space malloc failed");
+        dwin_println("Space malloc failed");
         return RT_NULL;
     }
     
@@ -67,7 +68,7 @@ dwin_space_t dwin_space_alloc(const char *name, uint16_t len, uint8_t type)
     space->addr   = idle_addr;
     
     /* change idle addr */
-    idle_addr += len;
+    idle_addr += len*2;
     
     /* insert the list */
     node = list_node_new((void *)space);
@@ -85,18 +86,18 @@ void dwin_space_foreach(void)
     
     if(dwin_space_list == RT_NULL)
     {
-        dwin_println("no used space");
+        dwin_println("No used space");
         return;
     }
     
     iterator = list_iterator_new(dwin_space_list, LIST_HEAD);
     
     dwin_print(PKG_DWIN_PROMPT);
-    dwin_print("used space %dByte, idle space %dByte:\n", idle_addr, dwin_space_idle());
+    dwin_print("Used space %dbyte, idle space %dbyte:\n", idle_addr, dwin_space_idle());
     
     while((node = list_iterator_next(iterator)) != RT_NULL)
     {
-        dwin_print("<name> = %s,<addr> = 0x%.4x,<len> = %.6d", 
+        dwin_print("name=%s,addr=0x%.4x,len=%.6d", 
             ((dwin_space_t)(node->val))->name, 
             ((dwin_space_t)(node->val))->addr, 
             ((dwin_space_t)(node->val))->len);
@@ -107,16 +108,36 @@ void dwin_space_foreach(void)
             /* button */
             case dwin_type_button:
             {
-                dwin_print(",<type> = button,<match_val> = 0x%.4x", 
-                ((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->match_value);
+                dwin_print(",type=btn,matchval=0x%.4x", 
+                    ((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->match_value);
                 
-                if(((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->state == button_state_startup)
+                switch(((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->state)
                 {
-                    dwin_print(",<state> = startup\n");
+                    case button_press:
+                        dwin_print(",state=press\n");
+                    break;
+                    
+                    case button_stop:
+                        dwin_print(",state=stop\n");
+                    break;
                 }
-                else
+            }
+            break;
+            
+            case dwin_type_inputbox:
+            {
+                dwin_print(",type=inputbox,input=%d", 
+                    ((dwin_inputbox_t)(((dwin_space_t)(node->val))->plugin))->input_value);
+                
+                switch(((dwin_inputbox_t)(((dwin_space_t)(node->val))->plugin))->state)
                 {
-                    dwin_print(",<state> = stop\n");
+                    case inputbox_start:
+                        dwin_print(",state=start\n");
+                    break;
+                    
+                    case button_stop:
+                        dwin_print(",state=stop\n");
+                    break;
                 }
             }
             break;
@@ -128,12 +149,38 @@ void dwin_space_foreach(void)
 }
 
 #include "finsh.h"
-MSH_CMD_EXPORT_ALIAS(dwin_space_foreach, dsf, print used space);
-FINSH_FUNCTION_EXPORT_ALIAS(dwin_space_foreach, dsf, print used space);
+MSH_CMD_EXPORT_ALIAS(dwin_space_foreach, dsf, print used space info);
+FINSH_FUNCTION_EXPORT_ALIAS(dwin_space_foreach, dsf, print used space info);
 #endif
 
 /* get dwin space idle size */
 uint16_t dwin_space_idle(void)
 {
     return (PKG_DWIN_VAR_MAX_BYTE - idle_addr);
+}
+
+void *dwin_space_find(const char *name)
+{
+    dwin_space_t space;
+    list_node_t *node = RT_NULL;
+    list_iterator_t *iterator = RT_NULL;
+    
+    iterator = list_iterator_new(dwin_space_list, LIST_HEAD);
+    
+    while((node = list_iterator_next(iterator)) != RT_NULL)
+    {
+        space = (dwin_space_t)(node->val);
+        
+        /* Æ¥ÅäÃû³Æ */
+        if(rt_strcmp((const char *)space->name, name) == 0)
+        {
+            return space;
+        }
+    }
+    
+#ifdef DWIN_DEBUG
+    dwin_println("Not find space %s", name);
+#endif
+    
+    return RT_NULL;
 }

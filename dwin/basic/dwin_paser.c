@@ -3,6 +3,7 @@
 #include "list.h" 
 
 #include "dwin_plugin_button.h" 
+#include "dwin_plugin_inputbox.h" 
 
 extern list_t *dwin_space_list;
 
@@ -31,14 +32,37 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
         {
             switch(((dwin_space_t)(node->val))->type)
             {
-                /* 按键的启动和停止功能实现!!!! 代码还未写 */
                 case dwin_type_button:
                 {
                     /* 判断是否注册了回调函数 */
                     if(((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->press_cb != RT_NULL && 
                        ((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->match_value == ((data[7]<<8)+data[8]))
                     {
-                        ((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->press_cb(((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->args);
+                        switch(((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->state)
+                        {
+                            case button_press:
+                            {
+                                ((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->press_cb(((dwin_button_t)(((dwin_space_t)(node->val))->plugin))->args);
+                            }
+                            break;
+                        }
+                    }
+                }
+                break;
+                
+                case dwin_type_inputbox:
+                {
+                    if(((dwin_inputbox_t)(((dwin_space_t)(node->val))->plugin))->inputbox_cb != RT_NULL)
+                    {
+                        switch(((dwin_inputbox_t)(((dwin_space_t)(node->val))->plugin))->state)
+                        {
+                            case inputbox_start:
+                            {
+                                ((dwin_inputbox_t)(((dwin_space_t)(node->val))->plugin))->input_value = (data[7]<<24) + (data[8]<<16) + (data[9]<<8) + data[10];
+                                ((dwin_inputbox_t)(((dwin_space_t)(node->val))->plugin))->inputbox_cb(((dwin_inputbox_t)(((dwin_space_t)(node->val))->plugin))->input_value, ((dwin_inputbox_t)(((dwin_space_t)(node->val))->plugin))->args);
+                            }
+                            break;
+                        }
                     }
                 }
                 break;

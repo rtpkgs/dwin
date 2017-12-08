@@ -34,5 +34,6 @@ dwin_space_t    dwin_space_alloc    (const char *name, uint16_t len, uint8_t typ
 void            dwin_space_foreach  (void);
 #endif
 uint16_t        dwin_space_idle     (void);
+void *          dwin_space_find     (const char *name);
 
 #endif
