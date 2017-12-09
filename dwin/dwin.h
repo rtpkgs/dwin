@@ -4,5 +4,6 @@
 #include "dwin_init.h" 
 #include "dwin_plugin_button.h" 
 #include "dwin_plugin_inputbox.h" 
+#include "dwin_plugin_icon.h" 
 
 #endif 

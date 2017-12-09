@@ -4,6 +4,7 @@
 
 #include "dwin_plugin_button.h" 
 #include "dwin_plugin_inputbox.h" 
+#include "dwin_plugin_icon.h" 
 
 extern list_t *dwin_space_list;
 
@@ -69,6 +70,8 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
             }
         }
     }
+    
+    list_iterator_destroy(iterator);
     
     return dwin_err_none;
 }

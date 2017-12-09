@@ -57,7 +57,7 @@ uint8_t dwin_plugin_button_mode(const char *name, uint8_t mode)
 }
 
 /* 更新按键回调 */
-uint8_t dwin_plugin_button_update(const char*name, press_cb cb, void *p)
+uint8_t dwin_plugin_button_update(const char*name, press_cb cb, void *args)
 {
     dwin_space_t space;
     dwin_button_t button;
@@ -69,7 +69,7 @@ uint8_t dwin_plugin_button_update(const char*name, press_cb cb, void *p)
     }
     
     button = (dwin_button_t)(space->plugin);
-    button->args = p;
+    button->args = args;
     button->press_cb = cb;
     
     return dwin_err_none;

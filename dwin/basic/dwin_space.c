@@ -5,6 +5,7 @@
 /* plugin include */
 #include "dwin_plugin_button.h" 
 #include "dwin_plugin_inputbox.h" 
+#include "dwin_plugin_icon.h" 
 
 /* static data interface */
 list_t *dwin_space_list;
@@ -142,10 +143,36 @@ void dwin_space_foreach(void)
             }
             break;
             
+            case dwin_type_icon:
+            {
+                dwin_print(",type=icon,min=%d,max=%d,cur=%d", 
+                    ((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->min_index,
+                    ((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->max_index,
+                    ((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->current_index);
+                
+                switch(((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->state)
+                {
+                    case icon_start:
+                        dwin_print(",state=start\n");
+                    break;
+                    
+                    case icon_stop:
+                        dwin_print(",state=stop\n");
+                    break;
+                    
+                    case icon_autoplay:
+                        dwin_print(",state=autoplay\n");
+                    break;
+                }
+            }
+            break;
+            
             default:
             break;
         }
     }
+    
+    list_iterator_destroy(iterator);
 }
 
 #include "finsh.h"
@@ -174,6 +201,7 @@ void *dwin_space_find(const char *name)
         /* Æ¥ÅäÃû³Æ */
         if(rt_strcmp((const char *)space->name, name) == 0)
         {
+            list_iterator_destroy(iterator);
             return space;
         }
     }
@@ -181,6 +209,8 @@ void *dwin_space_find(const char *name)
 #ifdef DWIN_DEBUG
     dwin_println("Not find space %s", name);
 #endif
+    
+    list_iterator_destroy(iterator);
     
     return RT_NULL;
 }

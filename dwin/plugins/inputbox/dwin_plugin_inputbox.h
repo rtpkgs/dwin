@@ -6,13 +6,13 @@
 typedef struct dwin_inputbox
 {
     uint8_t state;
-    uint32_t input_value;
-    void (*inputbox_cb)(uint32_t input_value, void *args);
+    int32_t input_value;
+    void (*inputbox_cb)(int32_t input_value, void *args);
     void *args;
 } *dwin_inputbox_t; 
 
 /* 按下回调函数 */
-typedef void (*inputbox_cb)(uint32_t input_value, void *args);
+typedef void (*inputbox_cb)(int32_t input_value, void *args);
 
 /* 按键模式 */
 enum inputbox_state
@@ -22,9 +22,9 @@ enum inputbox_state
 };
 
 /* 外部函数 */
-uint8_t  dwin_plugin_inputbox_create(const char *name, inputbox_cb cb, void *p);
-uint8_t  dwin_plugin_inputbox_mode(const char *name);
-uint8_t  dwin_plugin_inputbox_update(const char *name,  inputbox_cb cb, void *p);
-uint32_t dwin_plugin_inputbox_read(const char *name);
+uint8_t dwin_plugin_inputbox_create(const char *name, inputbox_cb cb, void *args);
+uint8_t dwin_plugin_inputbox_mode(const char *name, uint8_t mode);
+uint8_t dwin_plugin_inputbox_update(const char *name, inputbox_cb cb, void *args);
+int32_t dwin_plugin_inputbox_read(const char *name);
 
 #endif

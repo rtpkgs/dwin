@@ -25,6 +25,6 @@ enum button_state
 /* Íâ²¿º¯Êý */
 uint8_t dwin_plugin_button_create(const char *name, press_cb cb, void *args);
 uint8_t dwin_plugin_button_mode(const char*name, uint8_t mode);
-uint8_t dwin_plugin_button_update(const char*name, press_cb cb, void *p);
+uint8_t dwin_plugin_button_update(const char*name, press_cb cb, void *args);
 
 #endif
