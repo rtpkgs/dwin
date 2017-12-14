@@ -6,6 +6,7 @@
 #include "dwin_plugin_button.h" 
 #include "dwin_plugin_inputbox.h" 
 #include "dwin_plugin_icon.h" 
+#include "dwin_plugin_textbox.h" 
 
 /* static data interface */
 list_t *dwin_space_list;
@@ -148,7 +149,7 @@ void dwin_space_foreach(void)
                 dwin_print(",type=icon,min=%d,max=%d,cur=%d", 
                     ((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->min_index,
                     ((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->max_index,
-                    ((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->current_index);
+                    ((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->cur_index);
                 
                 switch(((dwin_icon_t)(((dwin_space_t)(node->val))->plugin))->state)
                 {
@@ -164,6 +165,19 @@ void dwin_space_foreach(void)
                         dwin_print(",state=autoplay\n");
                     break;
                 }
+            }
+            break;
+            
+            case dwin_type_textbox:
+            {
+                uint8_t index = 0;
+                
+                dwin_print(",text=%s,hex=", ((dwin_textbox_t)(((dwin_space_t)(node->val))->plugin))->text);
+                for(index = 0; index < ((dwin_textbox_t)(((dwin_space_t)(node->val))->plugin))->len; index++)
+                {
+                    dwin_print("0x%.2x ", ((dwin_textbox_t)(((dwin_space_t)(node->val))->plugin))->text[index]);
+                }
+                dwin_print("\b\n");
             }
             break;
             
