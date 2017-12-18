@@ -26,7 +26,25 @@
 2. minor：次版本号
 3. revise：修订版本号
 
-返回值：major*10000 + minor*100 + revise
+返回值：版本编号：major * 10000 + minor * 100 + revise
 ```
 uint32_t dwin_system_sw_version(uint8_t *major, uint8_t *minor, uint8_t *revise)
+```
+
+获取当前dwin显示屏硬件版本：
+1. major：主版本号
+2. minor：次版本号
+3. revise：修订版本号(目前无效, 只能为0)
+
+返回值：版本编号：major * 10000 + minor * 100 + revise
+```
+uint32_t dwin_system_hw_version(uint8_t *major, uint8_t *minor, uint8_t *revise)
+```
+
+获取显示屏背光亮度：
+1. lvl：背光亮度返回值
+
+返回值：错误码
+```
+uint8_t dwin_system_get_backlight_lvl(uint8_t *lvl)
 ```
