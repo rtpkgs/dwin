@@ -21,7 +21,7 @@
 
 ## 2.1 系统功能
 
-### 获取当前dwin库版本：
+### 1. 获取当前dwin库版本：
 1. major：主版本号
 2. minor：次版本号
 3. revise：修订版本号
@@ -31,7 +31,7 @@
 uint32_t dwin_system_sw_version(uint8_t *major, uint8_t *minor, uint8_t *revise)
 ```
 
-### 获取当前dwin显示屏硬件版本：
+### 2. 获取当前dwin显示屏硬件版本：
 1. major：主版本号
 2. minor：次版本号
 3. revise：修订版本号(目前无效, 只能为0)
@@ -41,10 +41,34 @@ uint32_t dwin_system_sw_version(uint8_t *major, uint8_t *minor, uint8_t *revise)
 uint32_t dwin_system_hw_version(uint8_t *major, uint8_t *minor, uint8_t *revise)
 ```
 
-### 获取显示屏背光亮度：
+### 3. 获取显示屏背光亮度：
 1. lvl：背光亮度返回值
 
 返回值：错误码
 ```
 uint8_t dwin_system_get_backlight_lvl(uint8_t *lvl)
+```
+
+### 4. 设置显示屏背光亮度：
+1. lvl：待设置背光亮度
+
+返回值：错误码
+```
+uint8_t dwin_system_set_backlight_lvl(uint8_t lvl)
+```
+
+### 5. 控制蜂鸣器响(不受蜂鸣器使能印象)：
+1. time：控制蜂鸣器响time*10ms
+
+返回值：错误码
+```
+uint8_t dwin_system_set_beep(uint8_t time)
+```
+
+### 6. 设置当前页id：
+1. id：准备跳转页面
+
+返回值：错误码
+```
+uint8_t dwin_system_set_page_id(uint16_t id)
 ```
