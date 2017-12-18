@@ -1,51 +1,21 @@
-# Dwin Event Processing Library for C-Language #
-
-**Currently, Optimize the underlying framework，Please wait for 1.3.1 release**
-
-[![build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/liu2guang/dwlib)
-[![release](https://img.shields.io/badge/Release-v1.3.0-orange.svg)](https://github.com/liu2guang/dwlib/releases)
-[![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
-[![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
-
-The dwin(Dwin Event Processing Library for C-Language) is the open source dw display event processing library, It supports the **`ENV`** development environment for RT-Thread3.0. Users can configure libraries directly in **`menuconfig`**. The dwin supports highly clipping characteristics.
-
-Display module purchase address:[DWIN Display Official Taobao Store](https://dwinhmi.taobao.com/index.htm?spm=2013.1.w5002-14432573301.2.6f6a88bfvHBSBF "[TaoBao]").
-
-## Overview ##
-The following display models have been tested: 
-~~~
-1. DMT48270M043_02W(The program ape USES model)
-2. None
-~~~
-
-Welcome to the test results of other display models.
-
-
-To write...
-
-
-# Dwin显示屏事件处理库 for C语言 #
-
-**目前, 优化底层框架中.请等待1.3.0发布**
+# dwin库 #
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
-[![release](https://img.shields.io/badge/Release-v1.2.0-orange.svg)](https://github.com/liu2guang/dwlib/releases)
-[![license](https://img.shields.io/badge/license-MIT-000000.svg)](https://github.com/liu2guang/dwlib/blob/master/LICENSE)
-[![qq](https://img.shields.io/badge/QQ-1004383796-1E90FF.svg)](tencent://message/?uin=1004383796&Site=www.hitux.com&Menu=yes)
+[![release](https://img.shields.io/badge/Release-v1.4.0-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 
-显示屏模块购买地址：[迪文显示屏官方淘宝店](https://dwinhmi.taobao.com/index.htm?spm=2013.1.w5002-14432573301.2.6f6a88bfvHBSBF "[淘宝]").
+---
 
-Dwin(Dwin显示屏事件处理库 for C语言) 是开源的迪文显示屏事件处理库, 它支持RT-Thread3.0的 **`ENV`** 开发环境. 用户可以使用 **`menuconfig`** 工具配置库. 同时Dwin支持高度裁剪特性.
+# 1. 介绍
+[dwin](https://github.com/liu2guang/dwin) 是一款便携性、高剪裁性的迪文科技显示屏驱动库。该库主要是解决用户去重复设计底层的问题, 让用户放更多时间去设计应用层代码。
 
-## 简介 ##
-下列显示屏模块以及被测试: 
-~~~
-1. DMT48270M043_02W(本程序猿使用型号)
-2. 无
-~~~
+## 1.1 主要特性
 
-欢迎提交其他显示屏型号的测试效果.
+- 支持dwin显示屏触摸数据自动上传解析；
+- 支持用户主动式读写寄存器和数据空间； 
+- 支持系统配置功能；
+- 支持[RT-Thread3.0](http://www.rt-thread.org/) ENV新特性，不支持其他OS平台和裸机平台；
+- 支持 **按键** 、 **数字输入框** 、 **文本显示框** 和 **图标** 插件，保留自定义插件编写接口；
+- 支持空间信息导出，在代码中申请的组件可以在finsh中导出，然后去dwin工程配置, 解决来回修改工程的问题和空间分配混乱的问题；
 
-待编写...
-
+# 2. 功能
 
