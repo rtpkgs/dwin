@@ -21,6 +21,8 @@
 
 ## 2.1 系统功能
 
+系统功能是dwin必须选中的功能件。
+
 ### 1. 获取当前dwin库版本：
 1. major：主版本号
 2. minor：次版本号
@@ -123,7 +125,7 @@ uint8_t dwin_system_set_buzzer(uint8_t enable)
 
 返回值：错误码
 ```
-uint8_t dwin_system_get_time(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *seconds)
+uint8_t dwin_system_get_time(uint8_t *year,uint8_t *month,uint8_t *day,uint8_t *hour,uint8_t *minute,uint8_t *seconds)
 ```
 
 ### 13. 设置时间：
@@ -136,6 +138,19 @@ uint8_t dwin_system_get_time(uint8_t *year, uint8_t *month, uint8_t *day, uint8_
 
 返回值：错误码
 ```
-uint8_t dwin_system_set_time(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t seconds)
+uint8_t dwin_system_set_time(uint8_t year,uint8_t month, uint8_t day,uint8_t hour,uint8_t minute,uint8_t seconds)
 ```
 
+## 2.2 按键插件
+
+按键插件是可选功能, 配置宏xxxxxx。
+
+### 1. 创建按键组件：
+1. name：按键名称
+2. cb：按键按下回调函数
+3. args：回调函数传入参数
+
+返回值：错误码
+```
+uint8_t dwin_plugin_button_create(const char *name, press_cb cb, void *args)
+```
