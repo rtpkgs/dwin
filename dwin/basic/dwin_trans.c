@@ -10,7 +10,7 @@
  * Date           Author       Notes 
  * 2017-12-08     liu2guang    实现主动询问与自动上传数据解耦. 
  */ 
-#include "dwin_trans.h"
+#include "dwin_trans.h" 
 #include "dwin_paser.h" 
 
 /* 自动上传数据监听器接收状态枚
@@ -110,7 +110,7 @@ static void dwin_autoupload_watch(void *p)
         if(state == STATE_DATA_HEAD_L)
         {
             /* 调试打印, 打印监听器识别到的数据帧长度 */
-#ifdef DWIN_DEBUG
+#if (DWIN_DEBUG >= 2)
             dwin_print(PKG_DWIN_PROMPT);
             dwin_print("Listen to %dbyte data frame:", ch+3);
 #endif
@@ -128,7 +128,7 @@ static void dwin_autoupload_watch(void *p)
             if(index == data[2] + 3)
             {
                 /* 监听器接收数据帧打印 */
-#ifdef DWIN_DEBUG
+#if (DWIN_DEBUG >= 2)
                 dwin_print("{");
                 for(index = 0; index < (data[2]+3); index++)
                 {
@@ -189,9 +189,10 @@ static uint8_t dwin_watch_stop(void)
 }
 
 /* 自动上传监测器初始化 */
-uint8_t dwin_watch_init(const char *name, uint32_t bandrate)
+uint8_t dwin_watch_init(const char *name, uint32_t baudrate)
 {
     rt_err_t ret = RT_EOK;
+    struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;
     
     RT_ASSERT(name != RT_NULL);
     
@@ -202,6 +203,10 @@ uint8_t dwin_watch_init(const char *name, uint32_t bandrate)
         dwin_println("%s device dont found", name);
         return dwin_err_error;
     }
+    
+    /* 修改设备波特率 */
+    config.baud_rate = baudrate;
+    rt_device_control(dwin_uart_device, RT_DEVICE_CTRL_CONFIG, (void *)&config);
     
     /* 打开设备 */
     ret = rt_device_open(dwin_uart_device, RT_DEVICE_OFLAG_RDWR | 
@@ -266,7 +271,7 @@ uint8_t dwin_var_write(uint16_t addr, uint16_t *data, uint8_t len)
     }
     
     /* 调试信息 */
-#ifdef DWIN_DEBUG
+#if (DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
     dwin_print("write [0x%.4x] var [%dbyte]:", addr, len*2);
 
@@ -335,7 +340,7 @@ uint8_t dwin_var_read(uint16_t addr, uint16_t *data, uint8_t len)
     }
     
     /* 调试信息打印 */
-#ifdef DWIN_DEBUG
+#if (DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
     dwin_print("user readvar [%dByte]:{", len);
     for(index = 0; index < (len*2+7); index++)
@@ -375,7 +380,7 @@ uint8_t dwin_reg_write(uint8_t addr, uint8_t *data, uint8_t len)
         dwin_putc(data[index]);
     }
     
-#ifdef DWIN_DEBUG
+#if (DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
     dwin_print("write [0x%.2x] reg [%dbyte]:", addr, len);
 
@@ -437,7 +442,7 @@ uint8_t dwin_reg_read(uint8_t addr, uint8_t *data, uint8_t len)
     }
     
     /* 调试信息 */
-#ifdef DWIN_DEBUG
+#if (DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
     dwin_print("user readreg [%dByte]:{", len);
     for(index = 0; index < (len+6); index++)

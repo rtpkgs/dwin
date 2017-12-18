@@ -3,8 +3,7 @@
 
 #include "dwin_def.h" 
 
-/* type define */
-/* space data struct */
+/* 空间描述结构体 */
 typedef struct dwin_space
 {
     uint8_t name[PKG_DWIN_SPACE_NAME_LEN];
@@ -14,7 +13,7 @@ typedef struct dwin_space
     uint8_t type;
 } *dwin_space_t; 
 
-/* space used plugins type */
+/* 空间使用插件类型 */
 enum plugin_type
 {
     dwin_type_user = 0,
@@ -26,14 +25,13 @@ enum plugin_type
     dwin_type_qrcode
 };
 
-/* extern api */
-/* malloc dwin space */
+/* 导出函数 */
 uint8_t         dwin_space_init     (void);
 dwin_space_t    dwin_space_alloc    (const char *name, uint16_t len, uint8_t type);
-#ifdef DWIN_DEBUG
+#if (DWIN_DEBUG >= 1)
 void            dwin_space_foreach  (void);
 #endif
 uint16_t        dwin_space_idle     (void);
-void *          dwin_space_find     (const char *name);
+dwin_space_t    dwin_space_find     (const char *name);
 
 #endif

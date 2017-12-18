@@ -1,9 +1,18 @@
 #ifndef __DWIN_DEF_H_ 
 #define __DWIN_DEF_H_ 
 
-#include "rtthread.h"
+#include <stdbool.h>
+#include <rtthread.h>
+#include <rtdevice.h>
 
-#define DWIN_DEBUG
+/* 打印应用层信息 = 1, 打印底层信息 = 2 */
+#define DWIN_DEBUG 1
+
+/* dwin version information */
+#define DWIN_MAJOR_VER      1L          /* major version number */
+#define DWIN_MINOR_VER      3L          /* minor version number */
+#define DWIN_REVISE_VER     0L          /* revise version number */
+#define DWIN_VERSION        ((DWIN_MAJOR_VER*10000) + (DWIN_MINOR_VER*100) + DWIN_REVISE_VER)
 
 /* dwin config */
 /* transport framehead high byte */
@@ -48,6 +57,9 @@
 
 /* dwin debug */
 #ifndef DWIN_DEBUG
+#define DWIN_DEBUG 0
+#endif
+#if (DWIN_DEBUG == 0)
 #define dwin_print(...) 
 #define dwin_println(...) 
 #else
@@ -63,13 +75,20 @@
 }
 #endif
 
+#define BITx(n) (1 << n) 
+#define BITS_SET(data, bits)  ((data) |=  (bits))  
+#define BITS_CLR(data, bits)  ((data) &= ~(bits))  
+#define BITS_TGL(data, bits)  ((data) ^=  (bits))  
+#define BITS_READ(data, bits) ((data) &   (bits)) 
+
 /* type define */
 /* error code */
 typedef enum
 {
     dwin_err_none = 0, 
     dwin_err_error, 
-    dwin_err_timeout
+    dwin_err_timeout,
+    dwin_err_reinit
 } dwin_err_t;
 
 #endif
