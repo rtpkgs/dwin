@@ -66,9 +66,76 @@ uint8_t dwin_system_set_beep(uint8_t time)
 ```
 
 ### 6. 设置当前页id：
-1. id：准备跳转页面
+1. id：准备跳转页面id
 
 返回值：错误码
 ```
 uint8_t dwin_system_set_page_id(uint16_t id)
 ```
+
+### 7. 获取当前页id：
+1. id：获取当前页面id
+
+返回值：错误码
+```
+uint8_t dwin_system_get_page_id(uint16_t *id)
+```
+
+### 8. 设置触摸控制背光：
+1. enable：0失能, 1使能
+
+返回值：错误码
+```
+uint8_t dwin_system_set_backligth(uint8_t enable)
+```
+
+### 9. 设置触摸数据是否自上传：
+1. enable：0失能, 1使能
+
+返回值：错误码
+```
+uint8_t dwin_system_set_autoupdate(uint8_t enable)
+```
+
+### 10. 设置数据寄存器上电初始化模式：
+1. enable：0上电初始化为0x00, 1上电有L22字库文件加载
+
+返回值：错误码
+```
+uint8_t dwin_system_set_dataload_mode(uint8_t enable)
+```
+
+### 11. 设置蜂鸣器是否开启：
+1. enable：0开启 1未开启, 不影响dwin_system_set_beep接口
+
+返回值：错误码
+```
+uint8_t dwin_system_set_buzzer(uint8_t enable)
+```
+
+### 12. 获取时间：
+1. year：年，从2000开始，17代表2017
+2. month：月
+3. day：日
+4. hour：时
+5. minute：分
+6. seconds：秒
+
+返回值：错误码
+```
+uint8_t dwin_system_get_time(uint8_t *year, uint8_t *month, uint8_t *day, uint8_t *hour, uint8_t *minute, uint8_t *seconds)
+```
+
+### 13. 设置时间：
+1. year：年，从2000开始，17代表2017
+2. month：月
+3. day：日
+4. hour：时
+5. minute：分
+6. seconds：秒
+
+返回值：错误码
+```
+uint8_t dwin_system_set_time(uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t seconds)
+```
+
