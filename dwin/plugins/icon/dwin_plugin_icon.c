@@ -17,7 +17,7 @@
 #define DWIN_ICON_SPACE_BYTE  (1)         /* 按键变量空间大小 */
 
 /* 创建icon组 */
-uint8_t dwin_plugin_icon_create(const char *name, uint16_t min, uint16_t max, uint16_t current)
+uint8_t dwin_plugin_icon_create(const char *name, uint16_t min, uint16_t max, uint16_t cur)
 {
     dwin_space_t icon_space;
     dwin_icon_t  icon_handle;
@@ -42,18 +42,19 @@ uint8_t dwin_plugin_icon_create(const char *name, uint16_t min, uint16_t max, ui
     
     /* 填充结构体 */
     icon_handle->state = icon_start;
-    icon_handle->cur_index = current;
+    icon_handle->cur_index = cur;
     icon_handle->min_index = min;
     icon_handle->max_index = max;
     icon_space ->plugin = (void *)icon_handle;
     
     /* 改变icon序号 */
-    dwin_plugin_icon_update(name, current);
+    dwin_plugin_icon_update(name, cur);
     
     return dwin_err_none;
 }
 
 /* 改变icon组显示状态 */
+#if 0
 uint8_t dwin_plugin_icon_mode(const char *name, uint8_t mode)
 {
     dwin_space_t space;
@@ -70,6 +71,7 @@ uint8_t dwin_plugin_icon_mode(const char *name, uint8_t mode)
     
     return dwin_err_none;
 }
+#endif 
 
 /* 更新icon组显示序号 */
 uint8_t dwin_plugin_icon_update(const char *name, uint16_t current)

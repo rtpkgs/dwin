@@ -10,7 +10,7 @@
 
 /* dwin version information */
 #define DWIN_MAJOR_VER      1L          /* major version number */
-#define DWIN_MINOR_VER      3L          /* minor version number */
+#define DWIN_MINOR_VER      4L          /* minor version number */
 #define DWIN_REVISE_VER     0L          /* revise version number */
 #define DWIN_VERSION        ((DWIN_MAJOR_VER*10000) + (DWIN_MINOR_VER*100) + DWIN_REVISE_VER)
 

@@ -21,9 +21,9 @@ enum icon_state
 };
 
 /* 导出接口 */
-uint8_t  dwin_plugin_icon_create(const char *name, uint16_t min, uint16_t max, uint16_t current);
+uint8_t  dwin_plugin_icon_create(const char *name, uint16_t min, uint16_t max, uint16_t cur);
 uint8_t  dwin_plugin_icon_update(const char *name, uint16_t current);
-uint8_t  dwin_plugin_icon_mode(const char *name, uint8_t mode);
+// uint8_t  dwin_plugin_icon_mode(const char *name, uint8_t mode);
 uint16_t dwin_plugin_icon_read(const char *name);
 
 #endif
