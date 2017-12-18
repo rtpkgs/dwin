@@ -19,3 +19,11 @@
 
 # 2. 功能
 
+## 2.1 系统功能
+
+### 获取软件版本
+
+获取当前dwin库版本。
+```
+uint32_t dwin_system_sw_version(uint8_t *major, uint8_t *minor, uint8_t *revise)
+```
