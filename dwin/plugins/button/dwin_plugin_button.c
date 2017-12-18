@@ -1,3 +1,15 @@
+/*
+ * @File:   dwin_plugin_button.c 
+ * @Author: liu2guang 
+ * @Date:   2017-12-08 21:53:11 
+ * 
+ * @LICENSE: MIT
+ * https://github.com/liu2guang/dwin/blob/master/LICENSE
+ * 
+ * Change Logs: 
+ * Date           Author       Notes 
+ * 2017-12-08     liu2guang    实现按键插件. 
+ */ 
 #include "dwin_plugin_button.h" 
 
 /* 内部使用宏 */

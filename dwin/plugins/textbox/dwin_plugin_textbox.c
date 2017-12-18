@@ -1,7 +1,17 @@
+/*
+ * @File:   dwin_plugin_textbox.c 
+ * @Author: liu2guang 
+ * @Date:   2017-12-08 21:53:11 
+ * 
+ * @LICENSE: MIT
+ * https://github.com/liu2guang/dwin/blob/master/LICENSE
+ * 
+ * Change Logs: 
+ * Date           Author       Notes 
+ * 2017-12-08     liu2guang    实现文本框. 
+ */ 
 #include "dwin_plugin_textbox.h" 
 #include "dwin_trans.h" 
-
-// #define DWIN_TEXTBOX_SPACE_BYTE  (0) 
 
 /* char转short */ 
 static uint16_t *char2short(uint8_t *string)
