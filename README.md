@@ -1,7 +1,7 @@
 # dwin库 #
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
-[![release](https://img.shields.io/badge/Release-v1.4.0-orange.svg)](https://github.com/liu2guang/dwlib/releases)
+[![release](https://img.shields.io/badge/Release-v1.4.1-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 
 ---
 
