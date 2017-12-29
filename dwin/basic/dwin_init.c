@@ -43,7 +43,7 @@ uint8_t dwin_init(const char *name, uint32_t baudrate)
         return dwin_err_error; 
     }
     
-#if (DWIN_DEBUG >= 1)
+#if (PKG_DWIN_DEBUG >= 1)
     {
         uint8_t major, minor, revise, data[8];
         

@@ -28,7 +28,7 @@ enum plugin_type
 /* µ¼³öº¯Êý */
 uint8_t         dwin_space_init     (void);
 dwin_space_t    dwin_space_alloc    (const char *name, uint16_t len, uint8_t type);
-#if (DWIN_DEBUG >= 1)
+#if (PKG_DWIN_DEBUG >= 1)
 void            dwin_space_foreach  (void);
 #endif
 uint16_t        dwin_space_idle     (void);

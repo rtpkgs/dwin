@@ -110,7 +110,7 @@ static void dwin_autoupload_watch(void *p)
         if(state == STATE_DATA_HEAD_L)
         {
             /* 调试打印, 打印监听器识别到的数据帧长度 */
-#if (DWIN_DEBUG >= 2)
+#if (PKG_DWIN_DEBUG >= 2)
             dwin_print(PKG_DWIN_PROMPT);
             dwin_print("Listen to %dbyte data frame:", ch+3);
 #endif
@@ -128,7 +128,7 @@ static void dwin_autoupload_watch(void *p)
             if(index == data[2] + 3)
             {
                 /* 监听器接收数据帧打印 */
-#if (DWIN_DEBUG >= 2)
+#if (PKG_DWIN_DEBUG >= 2)
                 dwin_print("{");
                 for(index = 0; index < (data[2]+3); index++)
                 {
@@ -271,7 +271,7 @@ uint8_t dwin_var_write(uint16_t addr, uint16_t *data, uint8_t len)
     }
     
     /* 调试信息 */
-#if (DWIN_DEBUG >= 2)
+#if (PKG_DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
     dwin_print("write [0x%.4x] var [%dbyte]:", addr, len*2);
 
@@ -340,7 +340,7 @@ uint8_t dwin_var_read(uint16_t addr, uint16_t *data, uint8_t len)
     }
     
     /* 调试信息打印 */
-#if (DWIN_DEBUG >= 2)
+#if (PKG_DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
     dwin_print("user readvar [%dByte]:{", len);
     for(index = 0; index < (len*2+7); index++)
@@ -380,7 +380,7 @@ uint8_t dwin_reg_write(uint8_t addr, uint8_t *data, uint8_t len)
         dwin_putc(data[index]);
     }
     
-#if (DWIN_DEBUG >= 2)
+#if (PKG_DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
     dwin_print("write [0x%.2x] reg [%dbyte]:", addr, len);
 
@@ -442,7 +442,7 @@ uint8_t dwin_reg_read(uint8_t addr, uint8_t *data, uint8_t len)
     }
     
     /* 调试信息 */
-#if (DWIN_DEBUG >= 2)
+#if (PKG_DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
     dwin_print("user readreg [%dByte]:{", len);
     for(index = 0; index < (len+6); index++)

@@ -67,7 +67,7 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
                     /* 未注册按键回调函数 */
                     if(button->press_cb == RT_NULL)
                     {
-                    #if (DWIN_DEBUG >= 2)
+                    #if (PKG_DWIN_DEBUG >= 2)
                         dwin_println("Button %s no callback func", space->name);
                     #endif
                         break;
@@ -89,7 +89,7 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
                             /* 按键停止状态 */
                             case button_stop:
                             {
-                            #if (DWIN_DEBUG >= 2)
+                            #if (PKG_DWIN_DEBUG >= 2)
                                 dwin_println("Button %s stop state", space->name);
                             #endif
                             }
@@ -109,7 +109,7 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
                     /* 未注册按键回调函数 */
                     if(inputbox->inputbox_cb == RT_NULL)
                     {
-                    #if (DWIN_DEBUG >= 2)
+                    #if (PKG_DWIN_DEBUG >= 2)
                         dwin_println("Inputbox %s no callback func", space->name);
                     #endif
                         break;
@@ -121,7 +121,7 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
                         {
                             /* 获取输入值 */
                             inputbox->input_value = (data[7]<<24)+(data[8]<<16)+(data[9]<<8)+data[10];
-                        #if (DWIN_DEBUG >= 2)
+                        #if (PKG_DWIN_DEBUG >= 2)
                             dwin_println("Inputbox %s input %d", space->name, inputbox->input_value);
                         #endif
                             
@@ -133,7 +133,7 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
                         /* 按键停止状态 */
                         case inputbox_stop:
                         {
-                        #if (DWIN_DEBUG >= 2)
+                        #if (PKG_DWIN_DEBUG >= 2)
                             dwin_println("Inputbox %s stop state", space->name);
                         #endif
                         }

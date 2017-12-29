@@ -17,15 +17,12 @@
 #ifdef PKG_DWIN_ENABLE_PLUGIN_ICON
 #include "dwin_plugin_icon.h" 
 #endif
-
 #ifdef PKG_DWIN_ENABLE_PLUGIN_BUTTON
 #include "dwin_plugin_button.h" 
 #endif
-
 #ifdef PKG_DWIN_ENABLE_PLUGIN_TEXTBOX
 #include "dwin_plugin_textbox.h" 
 #endif
-
 #ifdef PKG_DWIN_ENABLE_PLUGIN_INPUTBOX
 #include "dwin_plugin_inputbox.h" 
 #endif
@@ -107,7 +104,7 @@ dwin_space_t dwin_space_alloc(const char *name, uint16_t len, uint8_t type)
 }
 
 /* 导出空间变量 */
-#if (DWIN_DEBUG >= 1)
+#if (PKG_DWIN_DEBUG >= 1)
 #define DWIN_CSI_RED_STA "\033[31;1m"   /* 红色加粗 */
 #define DWIN_CSI_GRE_STA "\033[32;1m"   /* 绿色加粗 */
 #define DWIN_CSI_END     "\033[0m"      
@@ -161,6 +158,7 @@ void dwin_space_foreach(void)
         switch(space->type)
         {
             /* button */
+#ifdef PKG_DWIN_ENABLE_PLUGIN_BUTTON
             case dwin_type_button:
             {
                 dwin_button_t button = (dwin_button_t)(space->plugin);
@@ -180,7 +178,9 @@ void dwin_space_foreach(void)
                 }
             }
             break;
+#endif
             
+#ifdef PKG_DWIN_ENABLE_PLUGIN_INPUTBOX
             case dwin_type_inputbox:
             {
                 dwin_inputbox_t inputbox = (dwin_inputbox_t)(space->plugin);
@@ -200,7 +200,9 @@ void dwin_space_foreach(void)
                 }
             }
             break;
+#endif
             
+#ifdef PKG_DWIN_ENABLE_PLUGIN_ICON
             case dwin_type_icon:
             {
                 dwin_icon_t icon = (dwin_icon_t)(space->plugin);
@@ -224,7 +226,9 @@ void dwin_space_foreach(void)
                 }
             }
             break;
+#endif
             
+#ifdef PKG_DWIN_ENABLE_PLUGIN_TEXTBOX
             case dwin_type_textbox:
             {
                 uint8_t index = 0;
@@ -239,6 +243,7 @@ void dwin_space_foreach(void)
                 dwin_print("\n");
             }
             break;
+#endif
             
             default:
             break;
@@ -280,7 +285,7 @@ dwin_space_t dwin_space_find(const char *name)
         }
     }
     
-#if (DWIN_DEBUG >= 2)
+#if (PKG_DWIN_DEBUG >= 2)
     dwin_println("Not find space %s", name);
 #endif
     
