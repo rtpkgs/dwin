@@ -3,6 +3,10 @@
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
 [![release](https://img.shields.io/badge/Release-v1.4.1-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 
+**[规划] 下版本规划进度条Probar, 页面管理器，滚动文字，刻度条功能**
+
+**【dwin开发交流群】：[点击加入群](https://jq.qq.com/?_wv=1027&k=5mY4di5 "群连接")，目前只有码畜流光菌本人!!尴尬！！**
+
 ---
 
 # 1. 介绍
