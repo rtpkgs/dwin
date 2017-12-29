@@ -7,6 +7,8 @@
 
 **【dwin开发交流群】：[点击加入群](https://jq.qq.com/?_wv=1027&k=5mY4di5 "群连接")，目前只有码畜流光菌本人!!尴尬！！**
 
+简单移植：目前配合dwin库移植需要去 https://github.com/liu2guang/packages 下载RT-Thread3.0 env环境需要的Kconfig和package.json文件到您本地的env环境中，在上面链接中下载clist和dwin放到env中在使用menuconfig就可以看见对应的库了，注意dwin没用使用RT-Thread下的list而是使用clib的list(clist)该库在我的github上面有，但是用menuconfig就可以不用下载，简单移植说明，详细的加上面的群询问我, 或者有哪位好心人来帮忙写下教程，实在没有时间写教程(其实是表达水平不够 @^_^@)
+
 ---
 
 # 1. 介绍
