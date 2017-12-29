@@ -43,7 +43,7 @@ uint8_t dwin_plugin_button_create(const char *name, press_cb cb, void *args)
     button_handle->args        = args;
     button_handle->press_cb    = cb;
     button_handle->state       = button_press;
-    button_handle->match_value = DWIN_BUTTON_PRESS_VALUE;
+    button_handle->match_value = PKG_DWIN_BUTTON_PRESS_VALUE;
     
     button_space ->plugin = (void *)button_handle;
     

@@ -6,7 +6,7 @@
 #include <rtdevice.h>
 
 /* 打印应用层信息 = 1, 打印底层信息 = 2 */
-#define DWIN_DEBUG 1
+#define PKG_DWIN_DEBUG 1
 
 /* dwin version information */
 #define DWIN_MAJOR_VER      1L          /* major version number */
@@ -19,11 +19,12 @@
 #ifndef PKG_DWIN_HEAD_H
 #define PKG_DWIN_HEAD_H (0x5A)
 #endif
+
+/* transport framehead low byte */
 #ifndef PKG_DWIN_HEAD_L
 #define PKG_DWIN_HEAD_L (0xA5)
 #endif
 
-/* transport framehead low byte */
 #ifndef PKG_DWIN_VAR_MAX_BYTE
 #define PKG_DWIN_VAR_MAX_BYTE (4096)
 #endif
@@ -44,8 +45,8 @@
 #endif
 
 /* 按键按下值 */
-#ifndef DWIN_BUTTON_PRESS_VALUE
-#define DWIN_BUTTON_PRESS_VALUE (0x0D0D)
+#ifndef PKG_DWIN_BUTTON_PRESS_VALUE
+#define PKG_DWIN_BUTTON_PRESS_VALUE (0x0D0D)
 #endif
 
 /* dwin macro */
@@ -56,10 +57,10 @@
 #define DWIN_VAR_WRITE  (0x82) 
 
 /* dwin debug */
-#ifndef DWIN_DEBUG
-#define DWIN_DEBUG 0
+#ifndef PKG_DWIN_DEBUG
+#define PKG_DWIN_DEBUG 0
 #endif
-#if (DWIN_DEBUG == 0)
+#if (PKG_DWIN_DEBUG == 0)
 #define dwin_print(...) 
 #define dwin_println(...) 
 #else
