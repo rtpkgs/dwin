@@ -129,7 +129,7 @@ uint8_t dwin_system_set_backlight_lvl(uint8_t lvl)
     return dwin_err_none; 
 }
 
-/* 控制蜂鸣器响 */
+/* 控制蜂鸣器响, 这里时间校正 */
 uint8_t dwin_system_set_beep(uint8_t time)
 {
     uint8_t ret = dwin_err_none;
@@ -148,8 +148,6 @@ uint8_t dwin_system_set_page_id(uint16_t id)
 {
     uint8_t ret = dwin_err_none;
     uint8_t id_temp[2];
-    
-    RT_ASSERT(id != RT_NULL);
     
     id_temp[0] = (id >> 8);
     id_temp[1] = (id << 8) >> 8;

@@ -24,7 +24,7 @@ uint8_t dwin_plugin_button_create(const char *name, press_cb cb, void *args)
     RT_ASSERT(name != RT_NULL);
     
     /* ·ÖÅä°´¼ü¿Õ¼ä */
-    button_space = dwin_space_alloc(name, DWIN_BUTTON_SPACE_BYTE, dwin_type_button);
+    button_space = dwin_space_alloc(name, DWIN_BUTTON_SPACE_BYTE, DWIN_TYPE_BTN);
     if(button_space == RT_NULL)
     {
         dwin_println("button [%s] space alloc failed");

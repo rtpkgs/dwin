@@ -1,13 +1,9 @@
 # dwin库 #
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
-[![release](https://img.shields.io/badge/Release-v1.4.1-orange.svg)](https://github.com/liu2guang/dwlib/releases)
+[![release](https://img.shields.io/badge/Release-v1.4.x-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 
-**[规划] 下版本规划进度条Probar, 页面管理器，滚动文字，刻度条功能**
-
-**【dwin开发交流群】：[点击加入群](https://jq.qq.com/?_wv=1027&k=5mY4di5 "群连接")，目前只有码畜流光菌本人!!尴尬！！**
-
-简单移植：目前配合dwin库移植需要去 https://github.com/liu2guang/packages 下载RT-Thread3.0 env环境需要的Kconfig和package.json文件到您本地的env环境中，在上面链接中下载clist和dwin放到env中在使用menuconfig就可以看见对应的库了，注意dwin没用使用RT-Thread下的list而是使用clib的list(clist)该库在我的github上面有，但是用menuconfig就可以不用下载，简单移植说明，详细的加上面的群询问我, 或者有哪位好心人来帮忙写下教程，实在没有时间写教程(其实是表达水平不够 @^_^@)
+** 这次更新是临时调整, 整个dwin库会在下个版本重构, 欢迎提出您的想法! **
 
 ---
 
@@ -20,7 +16,7 @@
 - 支持用户主动式读写寄存器和数据空间； 
 - 支持系统配置功能；
 - 支持[RT-Thread3.0](http://www.rt-thread.org/) ENV新特性，不支持其他OS平台和裸机平台；
-- 支持 **按键** , **数字输入框** , **文本显示框** 和 **图标** 插件，保留自定义插件编写接口；
+- 支持 **按键** , **数字输入框** , **文本显示框** , ** 数字显示 ** 和 **图标** 插件，保留自定义插件编写接口；
 - 支持空间信息导出，在代码中申请的组件可以在finsh中导出，然后去dwin工程配置, 解决来回修改工程的问题和空间分配混乱的问题；
 
 # 2. 功能

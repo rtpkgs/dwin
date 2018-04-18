@@ -25,7 +25,7 @@ uint8_t dwin_plugin_icon_create(const char *name, uint16_t min, uint16_t max, ui
     RT_ASSERT(name != RT_NULL);
     
     /* ·ÖÅä°´¼ü¿Õ¼ä */
-    icon_space = dwin_space_alloc(name, DWIN_ICON_SPACE_BYTE, dwin_type_icon);
+    icon_space = dwin_space_alloc(name, DWIN_ICON_SPACE_BYTE, DWIN_TYPE_ICON);
     if(icon_space == RT_NULL)
     {
         dwin_println("Icon [%s] space alloc failed");

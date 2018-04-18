@@ -5,13 +5,27 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 
-/* 打印应用层信息 = 1, 打印底层信息 = 2 */
-#define PKG_DWIN_DEBUG 1
+/* 插件头文件 */
+#if defined(PKG_DWIN_ENABLE_PLUGIN_ICON)
+#include "dwin_plugin_icon.h" 
+#endif
+#if defined(PKG_DWIN_ENABLE_PLUGIN_BUTTON) 
+#include "dwin_plugin_button.h" 
+#endif
+#if defined(PKG_DWIN_ENABLE_PLUGIN_TEXTBOX)
+#include "dwin_plugin_textbox.h" 
+#endif
+#if defined(PKG_DWIN_ENABLE_PLUGIN_INPUTBOX)
+#include "dwin_plugin_inputbox.h" 
+#endif
+#include "dwin_number.h" /* TODO */
+
+#include "dwin_system.h" 
 
 /* dwin version information */
-#define DWIN_MAJOR_VER      1L          /* major version number */
-#define DWIN_MINOR_VER      4L          /* minor version number */
-#define DWIN_REVISE_VER     1L          /* revise version number */
+#define DWIN_MAJOR_VER      1L          /* major version number  */
+#define DWIN_MINOR_VER      4L          /* minor version number  */
+#define DWIN_REVISE_VER     2L          /* revise version number */
 #define DWIN_VERSION        ((DWIN_MAJOR_VER*10000) + (DWIN_MINOR_VER*100) + DWIN_REVISE_VER)
 
 /* dwin config */
@@ -31,7 +45,7 @@
 
 /* dwin prompt */
 #ifndef PKG_DWIN_PROMPT
-#define PKG_DWIN_PROMPT "[dwin]"
+#define PKG_DWIN_PROMPT "[dwin] "
 #endif
 
 /* dwin watch thread priority */
@@ -60,20 +74,21 @@
 #ifndef PKG_DWIN_DEBUG
 #define PKG_DWIN_DEBUG 0
 #endif
+
 #if (PKG_DWIN_DEBUG == 0)
 #define dwin_print(...) 
 #define dwin_println(...) 
 #else
-#define dwin_print(...)             \
-{                                   \
-    rt_kprintf(__VA_ARGS__);        \
-}
-#define dwin_println(...)           \
-{                                   \
-    rt_kprintf(PKG_DWIN_PROMPT);    \
-    rt_kprintf(__VA_ARGS__);        \
-    rt_kprintf("\n");               \
-}
+#define dwin_print(...)                 \
+    do{                                 \
+        rt_kprintf(__VA_ARGS__);        \
+    }while(0) 
+#define dwin_println(...)               \
+    do{                                 \
+        rt_kprintf(PKG_DWIN_PROMPT);    \
+        rt_kprintf(__VA_ARGS__);        \
+        rt_kprintf("\n");               \
+    }while(0) 
 #endif
 
 #define BITx(n) (1 << n) 
@@ -89,7 +104,8 @@ typedef enum
     dwin_err_none = 0, 
     dwin_err_error, 
     dwin_err_timeout,
-    dwin_err_reinit
+    dwin_err_reinit,
+    dwin_err_para
 } dwin_err_t;
 
 #endif

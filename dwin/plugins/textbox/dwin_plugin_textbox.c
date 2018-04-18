@@ -1,5 +1,5 @@
 /*
- * @File:   dwin_plugin_textbox.c 
+ * @File:   dwin_textbox.c 
  * @Author: liu2guang 
  * @Date:   2017-12-08 21:53:11 
  * 
@@ -10,13 +10,17 @@
  * Date           Author       Notes 
  * 2017-12-08     liu2guang    实现文本框. 
  */ 
+ 
 #include "dwin_plugin_textbox.h" 
 #include "dwin_trans.h" 
 
-/* char转short */ 
-static uint16_t *char2short(uint8_t *string)
+/* 将char字符串转换成short字符串 */ 
+static uint16_t *char2short(uint8_t *string) 
 {
-    uint8_t temp, index; 
+    uint8_t temp; 
+    uint8_t index;
+    
+    RT_ASSERT(string != RT_NULL); 
     
     for(index = 0; index < rt_strlen((const char *)string); index+=2)
     {
@@ -28,81 +32,92 @@ static uint16_t *char2short(uint8_t *string)
     return (uint16_t *)string;
 }
 
-uint8_t dwin_plugin_textbox_create(const char *name, uint8_t *text, uint8_t len)
+/* 创建TextBox控件 */ 
+uint8_t dwin_textbox_create(const char *name, uint8_t *string, uint8_t length, uint8_t mode, uint32_t time)
 {
     dwin_space_t space; 
     dwin_textbox_t handle;
     
-    /* 判断文本长度 */
-    if(len%2 == 1)
-    {
-        dwin_println("Text is singular");
-        return dwin_err_error;
-    }
+    RT_ASSERT(name != RT_NULL); 
+    RT_ASSERT(string != RT_NULL); 
+    RT_ASSERT(length%2 == 0); 
     
-    space = dwin_space_alloc(name, len/2, dwin_type_textbox);
+    space = dwin_space_alloc(name, length/2, DWIN_TYPE_TEXTBOX);
     if(space == RT_NULL)
     {
-        dwin_println("textbox [%s] space alloc failed");
+        dwin_println("TextBox [%s] space alloc failed.", name);
         return dwin_err_error;
-    }
+    } 
     
-    
-    /* 分配句柄 */
     handle = (dwin_textbox_t)rt_malloc(sizeof(struct dwin_textbox));
     if(handle == RT_NULL)
     {
-        dwin_println("textbox [%s] handle alloc failed");
+        dwin_println("TextBox [%s] handle alloc failed.", name);
         return dwin_err_error;
     }
     
-    handle->len = len;
-    
-    /* 分配text缓存内存 */
-    handle->text = (uint8_t *)rt_malloc(len);
+    handle->len = length;
+    handle->text = (uint8_t *)rt_malloc(length);
     if(handle->text == RT_NULL)
     {
-        dwin_println("textbox [%s] text alloc failed");
+        dwin_println("TextBox [%s] text alloc failed.", name);
         return dwin_err_error;
     }
     
-    rt_strncpy((char *)handle->text, (const char *)text, len);
-    space->plugin = (void *)handle;
-    
-    /* 写内容 */
-    dwin_var_write(space->addr, char2short(text), len/2);
+    if(mode == TEXTBOX_TYPE_NORMAL)
+    {
+        rt_strncpy((char *)(handle->text), (const char *)string, handle->len); 
+        
+        space->plugin = (void *)handle;
+        dwin_var_write(space->addr, char2short(handle->text), handle->len/2); 
+    }
+    else if(mode == TEXTBOX_TYPE_STEP2STEP)
+    {
+        uint8_t index = 0; 
+        
+        space->plugin = (void *)handle;
+        rt_memset((char *)(handle->text), 0, handle->len); 
+        dwin_var_write(space->addr, char2short(handle->text), handle->len/2); 
+        
+        for(index = 2; index <= length; index+=2)
+        {
+            rt_memcpy((char *)(handle->text), string, index); 
+            dwin_var_write(space->addr, char2short(handle->text), handle->len/2); 
+            
+            rt_thread_delay(time); 
+        }
+    }
+    else
+    {
+        return dwin_err_para; 
+    }
     
     return dwin_err_none;
 }
 
-uint8_t dwin_plugin_textbox_update(const char *name, uint8_t *text, uint8_t len)
+uint8_t dwin_textbox_update(const char *name, uint8_t *string, uint8_t length)
 {
     dwin_space_t space; 
+    
+    RT_ASSERT(name != RT_NULL); 
+    RT_ASSERT(string != RT_NULL); 
+    RT_ASSERT(length%2 == 0); 
     
     space = dwin_space_find(name);
     if(space == RT_NULL)
     {
-        dwin_println("No find space");
+        dwin_println("No find space.");
         return dwin_err_error;
     }
     
-    /* 检测文字长度是否超出申请的范围 */
-    if(len > ((space->len)*2))
+    if(length > ((space->len)*2))
     {
-        dwin_println("Text is too long");
+        dwin_println("Text is too long.");
         return dwin_err_error;
     }
     
-    /* 检测文字长度是否为单数 */
-    if(len%2 == 1)
-    {
-        dwin_println("Text is singular");
-        return dwin_err_error;
-    }
-    
-    /* 写内容 */
-    dwin_var_write(space->addr, char2short(text), len/2);
-    rt_strncpy((char *)(((dwin_textbox_t)(space->plugin))->text), (const char *)text, len);
+    dwin_var_write(space->addr, char2short(string), length/2);
+    rt_strncpy((char *)(((dwin_textbox_t)(space->plugin))->text), (const char *)string, length);
     
     return dwin_err_none;
 }

@@ -15,19 +15,6 @@
 #include "dwin_paser.h" 
 #include "dwin_space.h" 
 
-/* 插件头文件 */
-#ifdef PKG_DWIN_ENABLE_PLUGIN_BUTTON
-#include "dwin_plugin_button.h" 
-#endif
-
-#ifdef PKG_DWIN_ENABLE_PLUGIN_INPUTBOX
-#include "dwin_plugin_inputbox.h" 
-#endif
-
-#ifdef PKG_DWIN_ENABLE_PLUGIN_ICON
-#include "dwin_plugin_icon.h" 
-#endif
-
 /* 导入空间变量器链表头 */
 extern list_t *dwin_space_list;
 
@@ -60,7 +47,7 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
             {
 #ifdef PKG_DWIN_ENABLE_PLUGIN_BUTTON
                 /* 按键插件 */
-                case dwin_type_button:
+                case DWIN_TYPE_BTN:
                 {
                     dwin_button_t button = (dwin_button_t)(space->plugin);
                     
@@ -102,7 +89,7 @@ uint8_t dwin_paser(uint8_t *data, uint8_t len)
                 
                 /* 输入框插件 */
 #ifdef PKG_DWIN_ENABLE_PLUGIN_INPUTBOX
-                case dwin_type_inputbox:
+                case DWIN_TYPE_INPUTBOX:
                 {
                     dwin_inputbox_t inputbox = (dwin_inputbox_t)(space->plugin);
                     

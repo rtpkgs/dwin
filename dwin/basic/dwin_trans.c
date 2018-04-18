@@ -382,7 +382,7 @@ uint8_t dwin_reg_write(uint8_t addr, uint8_t *data, uint8_t len)
     
 #if (PKG_DWIN_DEBUG >= 2)
     dwin_print(PKG_DWIN_PROMPT);
-    dwin_print("write [0x%.2x] reg [%dbyte]:", addr, len);
+    dwin_print("user write [0x%.2x] reg [%dbyte]:", addr, len);
 
     dwin_print("{");
     for(index = 0; index < len; index++)

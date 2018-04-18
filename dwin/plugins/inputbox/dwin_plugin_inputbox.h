@@ -26,5 +26,6 @@ uint8_t dwin_plugin_inputbox_create(const char *name, inputbox_cb cb, void *args
 uint8_t dwin_plugin_inputbox_mode(const char *name, uint8_t mode);
 uint8_t dwin_plugin_inputbox_update(const char *name, inputbox_cb cb, void *args);
 int32_t dwin_plugin_inputbox_read(const char *name);
+uint8_t dwin_plugin_inputbox_clear(const char *name); 
 
 #endif

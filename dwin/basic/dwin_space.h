@@ -16,13 +16,14 @@ typedef struct dwin_space
 /* 空间使用插件类型 */
 enum plugin_type
 {
-    dwin_type_user = 0,
-    dwin_type_button,
-    dwin_type_icon,
-    dwin_type_inputbox,
-    dwin_type_textbox,
-    dwin_type_login,
-    dwin_type_qrcode
+    DWIN_TYPE_BTN = 0,
+    DWIN_TYPE_ICON,
+    DWIN_TYPE_INPUTBOX,
+    DWIN_TYPE_TEXTBOX,
+    DWIN_TYPE_LOGIN,
+    DWIN_TYPE_QRCODE,
+    DWIN_TYPE_NUMBER,
+    DWIN_TYPE_MAX
 };
 
 /* 导出函数 */

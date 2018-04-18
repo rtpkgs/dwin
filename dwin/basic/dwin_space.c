@@ -13,20 +13,6 @@
 #include "list.h"
 #include "dwin_space.h" 
 
-/* 插件头文件 */
-#ifdef PKG_DWIN_ENABLE_PLUGIN_ICON
-#include "dwin_plugin_icon.h" 
-#endif
-#ifdef PKG_DWIN_ENABLE_PLUGIN_BUTTON
-#include "dwin_plugin_button.h" 
-#endif
-#ifdef PKG_DWIN_ENABLE_PLUGIN_TEXTBOX
-#include "dwin_plugin_textbox.h" 
-#endif
-#ifdef PKG_DWIN_ENABLE_PLUGIN_INPUTBOX
-#include "dwin_plugin_inputbox.h" 
-#endif
-
 /* 空间管理器链表 */
 list_t *dwin_space_list;
 
@@ -69,7 +55,7 @@ dwin_space_t dwin_space_alloc(const char *name, uint16_t len, uint8_t type)
     
     RT_ASSERT(name != RT_NULL);
     RT_ASSERT(len  != 0);
-    RT_ASSERT(type <= dwin_type_qrcode);
+    RT_ASSERT(type <= DWIN_TYPE_MAX);
     
     /* 检查空间是否足够 */
     if((len*2) > dwin_space_idle())
@@ -159,7 +145,7 @@ void dwin_space_foreach(void)
         {
             /* button */
 #ifdef PKG_DWIN_ENABLE_PLUGIN_BUTTON
-            case dwin_type_button:
+            case DWIN_TYPE_BTN:
             {
                 dwin_button_t button = (dwin_button_t)(space->plugin);
                 
@@ -181,7 +167,7 @@ void dwin_space_foreach(void)
 #endif
             
 #ifdef PKG_DWIN_ENABLE_PLUGIN_INPUTBOX
-            case dwin_type_inputbox:
+            case DWIN_TYPE_INPUTBOX:
             {
                 dwin_inputbox_t inputbox = (dwin_inputbox_t)(space->plugin);
                 
@@ -203,7 +189,7 @@ void dwin_space_foreach(void)
 #endif
             
 #ifdef PKG_DWIN_ENABLE_PLUGIN_ICON
-            case dwin_type_icon:
+            case DWIN_TYPE_ICON:
             {
                 dwin_icon_t icon = (dwin_icon_t)(space->plugin);
                 
@@ -229,13 +215,14 @@ void dwin_space_foreach(void)
 #endif
             
 #ifdef PKG_DWIN_ENABLE_PLUGIN_TEXTBOX
-            case dwin_type_textbox:
+            case DWIN_TYPE_TEXTBOX:
             {
                 uint8_t index = 0;
                 dwin_textbox_t textbox = (dwin_textbox_t)(space->plugin);
                 
-                dwin_print("textbox  ");
-                dwin_print("%s(text), hex:0x", textbox->text);
+                dwin_print("TextBox  ");
+                //dwin_print("%s , GBK:0x", textbox->text);
+                dwin_print("GBK:0x");
                 for(index = 0; index < textbox->len; index++)
                 {
                     dwin_print("%.2x", textbox->text[index]);
@@ -244,7 +231,12 @@ void dwin_space_foreach(void)
             }
             break;
 #endif
-            
+            case DWIN_TYPE_NUMBER: 
+            {
+                dwin_number_t handle = (dwin_number_t)(space->plugin); 
+                dwin_print("Number   ");
+                dwin_print("%d(show)\n", handle->number);
+            }
             default:
             break;
         }
@@ -254,8 +246,8 @@ void dwin_space_foreach(void)
 }
 
 #include "finsh.h"
-MSH_CMD_EXPORT_ALIAS(dwin_space_foreach, dsf, print used space info);
-FINSH_FUNCTION_EXPORT_ALIAS(dwin_space_foreach, dsf, print used space info);
+MSH_CMD_EXPORT_ALIAS(dwin_space_foreach, dwin, print used space info);
+FINSH_FUNCTION_EXPORT_ALIAS(dwin_space_foreach, dwin, print used space info);
 #endif
 
 /* 获取空间剩余大小 */
