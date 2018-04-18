@@ -3,7 +3,7 @@
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/liu2guang/dwlib)
 [![release](https://img.shields.io/badge/Release-v1.4.x-orange.svg)](https://github.com/liu2guang/dwlib/releases)
 
-** 这次更新是临时调整, 整个dwin库会在下个版本重构, 欢迎提出您的想法! **
+ ** 这次更新是临时调整, 整个dwin库会在下个版本重构, 因为目前的dwin库这个轮子巨方和 天神 一样方, 谁用谁后悔, 有好的想法欢迎提出! ** 
 
 ---
 
