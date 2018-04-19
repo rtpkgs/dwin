@@ -2,3 +2,11 @@ language: c
 
 notifications:
   email: false
+
+compiler:
+  - gcc
+  - clang
+  
+# Change this to your needs
+script: scons
+
