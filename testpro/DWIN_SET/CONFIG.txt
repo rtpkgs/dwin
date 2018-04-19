@@ -1,5 +1,0 @@
-R1=07      ;波特率,07=115200
-R2=2C      ;Sys_CFG
-STOP_DWIN_OS;
-RC=00      ;
-
