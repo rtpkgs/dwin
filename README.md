@@ -7,5 +7,4 @@
 
 ## 1. 规划框架
 
-`dwin v2.x.x规划框架:` 
 ![dwin_framework](https://i.imgur.com/LzzqrOG.png) 
