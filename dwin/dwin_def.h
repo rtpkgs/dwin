@@ -19,11 +19,11 @@
 
 /* Default config */ 
 #ifndef DWIN_USING_MODEL
-#error "Please define 'DWIN_USING_MODEL'!" 
+#error "Please define 'DWIN_USING_MODEL' macro!" 
 #endif
 
 #ifndef DWIN_USING_UART
-#error "Please define 'DWIN_USING_UART'!" 
+#error "Please define 'DWIN_USING_UART' macro!" 
 #endif
 
 #ifndef DWIN_USING_BAUDRATE
@@ -45,18 +45,18 @@
 #ifndef DWIN_USING_DEBUG
 #define DWIN_DBG(fmt, ...) 
 #else
-#define DWIN_DBG(fmt, ...)                \
-do{                                       \
-    DWIN_USING_PRINT("[dwin] ");          \
-    DWIN_USING_PRINT(fmt, ##__VA_ARGS__); \
+#define DWIN_DBG(fmt, ...)                      \
+do{                                             \
+    DWIN_USING_PRINT("[\033[32mdwin\033[0m] "); \
+    DWIN_USING_PRINT(fmt, ##__VA_ARGS__);       \
 }while(0)
 #endif
     
 /* Info */ 
-#define DWIN_INFO(fmt, ...)               \
-do{                                       \
-    DWIN_USING_PRINT("[dwin] ");          \
-    DWIN_USING_PRINT(fmt, ##__VA_ARGS__); \
+#define DWIN_INFO(fmt, ...)                     \
+do{                                             \
+    DWIN_USING_PRINT("[\033[32mdwin\033[0m] "); \
+    DWIN_USING_PRINT(fmt, ##__VA_ARGS__);       \
 }while(0)
 
 enum dwin_watch_state

@@ -16,4 +16,9 @@
 
 #include "dwin_def.h" 
 
+/* low layer */ 
+#include "dwin_trans.h" 
+
+/* component layer */ 
+
 #endif 

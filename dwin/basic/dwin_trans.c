@@ -104,17 +104,17 @@ static void dwin_watch_run(void *p)
             if(index == watch.data[2] + 3)
             {
 #ifdef DWIN_USING_DEBUG
-                DWIN_DBG("Listen to (%d)byte data frame:", watch.data[2]); 
+                DWIN_DBG("Listen to \033[31m%d\033[0m bytes data frame:", watch.data[2]); 
                 
                 DWIN_USING_PRINT("{");
                 for(index = 0; index < (watch.data[2]+3); index++) 
                 {
-                    DWIN_USING_PRINT("0x%.2x ", watch.data[index]); 
+                    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", watch.data[index]); 
                 }
                 DWIN_USING_PRINT("\b}.\n");
 #endif
                 /* Data parse */ 
-                DWIN_DBG("Start parse.\n"); 
+                // DWIN_DBG("Start parse.\n"); 
                 
                 index = 0;
                 state = DWIN_WATCH_STATE_IDLE;
@@ -157,71 +157,23 @@ static rt_err_t dwin_watch_stop(void)
     return RT_EOK;
 }
 
-rt_err_t dwin_reg_read(uint8_t addr, uint8_t *data, uint8_t len)
+rt_err_t dwin_reg_read(rt_uint8_t addr, rt_uint8_t *data, rt_uint8_t len)
 {
-#if (DWIN_USING_MODEL == 0)
-    
-#endif
-    
-#if (DWIN_USING_MODEL == 1)
-    
-#endif
-    
-#if (DWIN_USING_MODEL == 2)
-    
-#endif
-    
     return RT_EOK; 
 }
 
-rt_err_t dwin_reg_write(uint8_t addr, uint8_t *data, uint8_t len)
+rt_err_t dwin_reg_write(rt_uint8_t addr, rt_uint8_t *data, rt_uint8_t len)
 {
-#if (DWIN_USING_MODEL == 0)
-    
-#endif
-    
-#if (DWIN_USING_MODEL == 1)
-    
-#endif
-    
-#if (DWIN_USING_MODEL == 2)
-    
-#endif
-    
     return RT_EOK; 
 }
 
-rt_err_t dwin_var_read(uint16_t addr, uint16_t *data, uint8_t len)
+rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 {
-#if (DWIN_USING_MODEL == 0)
-    
-#endif
-    
-#if (DWIN_USING_MODEL == 1)
-    
-#endif
-    
-#if (DWIN_USING_MODEL == 2)
-    
-#endif
-    
     return RT_EOK; 
 }
 
-rt_err_t dwin_var_write(uint16_t addr, uint16_t *data, uint8_t len)
+rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 {
-#if (DWIN_USING_MODEL == 0)
-    
-#endif
-    
-#if (DWIN_USING_MODEL == 1)
-    
-#endif
-    
-#if (DWIN_USING_MODEL == 2)
-    
-#endif
-    
     return RT_EOK; 
 }
 
