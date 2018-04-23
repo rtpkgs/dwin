@@ -20,14 +20,14 @@
 #define DWIN_VAR_READ  (0x83)
 
 /* Short to byte */ 
-#define DWIN_GET_ADDRH(addr) (((addr) & 0xFF00) >> 0x10)
-#define DWIN_GET_ADDRL(addr) (((addr) & 0x00FF) >> 0x00)
+#define DWIN_GET_BYTEH(addr) (((addr) & 0xFF00) >> 8)
+#define DWIN_GET_BYTEL(addr) (((addr) & 0x00FF) >> 0)
 
 /* DGUSII related */ 
 #define DWIN_DGUSII_ACKH (0x4F) 
 #define DWIN_DGUSII_ACKL (0x4B) 
-#define DWIN_DGUSII_GET_PAGE(reg) (((reg) & 0xFF00) >> 0x10)
-#define DWIN_DGUSII_GET_ADDR(reg) (((reg) & 0x00FF) >> 0x00)
+#define DWIN_DGUSII_GET_PAGE(reg) (((reg) & 0xFF00) >> 8)
+#define DWIN_DGUSII_GET_ADDR(reg) (((reg) & 0x00FF) >> 0)
 
 static struct dwin_watch watch; 
 
@@ -201,14 +201,14 @@ rt_err_t dwin_reg_read(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len)
     dwin_watch_putc(len); 
     
 #ifdef DWIN_USING_DEBUG
-    DWIN_DBG("Send var \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_DBG("Requests \033[31m%.3dByte\033[0m data: {", 7); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", 4); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_REG_READ); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_DGUSII_GET_PAGE(addr)); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_DGUSII_GET_ADDR(addr)); 
-    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m\b}.\n", len); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m}.\n", len); 
 #endif
     
     /* Blocking waits for data */ 
@@ -219,7 +219,7 @@ rt_err_t dwin_reg_read(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len)
         if(index == len+7) 
         {
 #ifdef DWIN_USING_DEBUG
-            DWIN_DBG("Read var \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            DWIN_DBG("Read reg \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
             
             for(index = 0; index < (rx_data[2]+3); index++) 
             {
@@ -268,6 +268,99 @@ rt_err_t dwin_reg_read(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len)
 
 rt_err_t dwin_reg_write(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len)
 {
+    uint8_t index = 0; 
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[6] = {0}; 
+    
+    RT_ASSERT(len  != 0);  
+    RT_ASSERT(data != RT_NULL); 
+    
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Wite reg failed error code: %d\n", ret); 
+        return ret; 
+    }
+    
+    /* Send 0x80 Cmd to The DGUS-II Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc(len + 3); 
+    dwin_watch_putc(DWIN_REG_WRITE); 
+    dwin_watch_putc(DWIN_DGUSII_GET_PAGE(addr)); 
+    dwin_watch_putc(DWIN_DGUSII_GET_ADDR(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        dwin_watch_putc(data[index]);
+    }
+    
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Wite reg \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", len + 3); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_REG_WRITE); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_DGUSII_GET_PAGE(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_DGUSII_GET_ADDR(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", data[index]); 
+    }
+    DWIN_USING_PRINT("\b}.\n"); 
+#endif
+    
+    index = 0; 
+    while(1) 
+    {
+        rx_data[index++] = dwin_watch_getc(); 
+        
+        if(index == 6) 
+        {
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Response \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            
+            for(index = 0; index < (rx_data[2]+3); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH) || 
+               (rx_data[1] != DWIN_USING_HEADL) || 
+               (rx_data[2] != 3)                || 
+               (rx_data[3] != DWIN_REG_WRITE)   || 
+               (rx_data[4] != DWIN_DGUSII_ACKH) || 
+               (rx_data[5] != DWIN_DGUSII_ACKL))
+            {
+                DWIN_DBG("Write reg response valid failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after write reg.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
+            }
+            else
+            {
+                break; 
+            }
+        }
+    }
+    
+    ret = dwin_watch_start();
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Failed to start watch after write var.\n"); 
+        return ret; 
+    }
+    
     return RT_EOK; 
 }
 
@@ -292,19 +385,19 @@ rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
     dwin_watch_putc(DWIN_USING_HEADL); 
     dwin_watch_putc(4); 
     dwin_watch_putc(DWIN_VAR_READ); 
-    dwin_watch_putc(DWIN_GET_ADDRH(addr)); 
-    dwin_watch_putc(DWIN_GET_ADDRL(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEH(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
     dwin_watch_putc(len); 
     
 #ifdef DWIN_USING_DEBUG
-    DWIN_DBG("Send var \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_DBG("Requests \033[31m%.3dByte\033[0m data: {", 7); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", 4); 
-    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_REG_READ); 
-    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_ADDRH(addr)); 
-    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_ADDRL(addr)); 
-    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m\b}.\n", len); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_VAR_READ); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m}.\n", len); 
 #endif
     
     /* Blocking waits for data */ 
@@ -329,8 +422,8 @@ rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
                (rx_data[1] != DWIN_USING_HEADL)     || 
                (rx_data[2] != (len*2+4))            || 
                (rx_data[3] != DWIN_VAR_READ)        || 
-               (rx_data[4] != DWIN_GET_ADDRH(addr)) || 
-               (rx_data[5] != DWIN_GET_ADDRL(addr)) || 
+               (rx_data[4] != DWIN_GET_BYTEH(addr)) || 
+               (rx_data[5] != DWIN_GET_BYTEL(addr)) || 
                (rx_data[6] != len))
             {
                 DWIN_DBG("Read var data Validation failed.\n"); 
@@ -367,6 +460,101 @@ rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 
 rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 {
+    uint8_t index = 0; 
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[6] = {0}; 
+    
+    RT_ASSERT((len >= 1) && (len <= 0x7D)); 
+    RT_ASSERT(data != RT_NULL); 
+    
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Wite var failed error code: %d\n", ret); 
+        return ret; 
+    }
+    
+    /* Send 0x82 Cmd to The DGUS-II Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc((len*2) + 3); 
+    dwin_watch_putc(DWIN_VAR_WRITE); 
+    dwin_watch_putc(DWIN_GET_BYTEH(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        dwin_watch_putc(DWIN_GET_BYTEH(data[index]));
+        dwin_watch_putc(DWIN_GET_BYTEL(data[index]));
+    }
+    
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Wite var \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", (len*2) + 3); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_VAR_WRITE); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(data[index])); 
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(data[index])); 
+    }
+    DWIN_USING_PRINT("\b}.\n"); 
+#endif
+    
+    index = 0; 
+    while(1)
+    {
+        rx_data[index++] = dwin_watch_getc(); 
+        
+        if(index == 6) 
+        {
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Response \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            
+            for(index = 0; index < (rx_data[2]+3); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH) || 
+               (rx_data[1] != DWIN_USING_HEADL) || 
+               (rx_data[2] != 3)                || 
+               (rx_data[3] != DWIN_VAR_WRITE)   || 
+               (rx_data[4] != DWIN_DGUSII_ACKH) || 
+               (rx_data[5] != DWIN_DGUSII_ACKL))
+            {
+                DWIN_DBG("Write var response valid failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after write var.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
+            }
+            else
+            {
+                break; 
+            }
+        }
+    }
+    
+    ret = dwin_watch_start();
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Failed to start watch after write var.\n"); 
+        return ret; 
+    }
+    
     return RT_EOK; 
 }
 #endif /* DWIN_USING_MODEL == 2 */ 
