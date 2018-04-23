@@ -17,9 +17,9 @@
 #include "dwin_def.h" 
 
 rt_err_t dwin_watch_init(dwin_t dwin, const char *name, rt_uint32_t baudrate); 
-rt_err_t dwin_reg_read(rt_uint8_t addr, rt_uint8_t *data, rt_uint8_t len); 
-rt_err_t dwin_reg_write(rt_uint8_t addr, rt_uint8_t *data, rt_uint8_t len); 
-rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len); 
+rt_err_t dwin_reg_read (rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len); 
+rt_err_t dwin_reg_write(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len); 
+rt_err_t dwin_var_read (rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len); 
 rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len); 
 
 #endif 
