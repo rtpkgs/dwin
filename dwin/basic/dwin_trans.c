@@ -19,10 +19,6 @@
 #define DWIN_VAR_WRITE (0x82)
 #define DWIN_VAR_READ  (0x83)
 
-/* Short to byte */ 
-#define DWIN_GET_BYTEH(addr) (((addr) & 0xFF00) >> 8)
-#define DWIN_GET_BYTEL(addr) (((addr) & 0x00FF) >> 0)
-
 /* DGUSII related */ 
 #define DWIN_DGUSII_ACKH (0x4F) 
 #define DWIN_DGUSII_ACKL (0x4B) 
@@ -38,8 +34,6 @@ static rt_err_t dwin_watch_putc(uint8_t ch)
         ret = RT_EFULL; 
     }
     
-    // rt_kprintf("0x%.2x ", ch); 
-    
     return ret;
 }
 
@@ -51,9 +45,7 @@ static uint8_t dwin_watch_getc(void)
     {
         rt_sem_take(watch.rxsem, RT_WAITING_FOREVER);
     }
-    
-    // rt_kprintf("0x%.2x ", ch); 
-    
+
     return ch;
 }
 
@@ -396,18 +388,9 @@ rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 {
     uint8_t index = 0; 
-    rt_err_t ret = RT_EOK; 
-    uint8_t rx_data[6] = {0}; 
     
     RT_ASSERT(len >= 1); 
     RT_ASSERT(data != RT_NULL); 
-    
-    ret = dwin_watch_stop(); 
-    if(ret != RT_EOK)
-    {
-        DWIN_DBG("Wite var failed error code: %d\n", ret); 
-        return ret; 
-    }
     
     /* Send 0x82 Cmd to The DGUS-II Dwin */ 
     dwin_watch_putc(DWIN_USING_HEADH); 
@@ -424,7 +407,7 @@ rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
     }
     
 #ifdef DWIN_USING_DEBUG
-    DWIN_DBG("Wite var \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_DBG("Wite var \033[31m%.3dByte\033[0m data: {", (len*2)+6); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", (len*2) + 3); 
@@ -440,58 +423,9 @@ rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
     DWIN_USING_PRINT("\b}.\n"); 
 #endif
     
-    index = 0; 
-    while(1)
-    {
-        rx_data[index++] = dwin_watch_getc(); 
-        
-        if(index == 6) 
-        {
-#ifdef DWIN_USING_DEBUG
-            DWIN_DBG("Response \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
-            
-            for(index = 0; index < (rx_data[2]+3); index++) 
-            {
-                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
-            }
-            DWIN_USING_PRINT("\b}.\n");
-#endif
-            
-            /* Validate response data */ 
-            if((rx_data[0] != DWIN_USING_HEADH) || 
-               (rx_data[1] != DWIN_USING_HEADL) || 
-               (rx_data[2] != 3)                || 
-               (rx_data[3] != DWIN_VAR_WRITE)   || 
-               (rx_data[4] != DWIN_DGUSII_ACKH) || 
-               (rx_data[5] != DWIN_DGUSII_ACKL))
-            {
-                DWIN_DBG("Write var response valid failed.\n"); 
-                
-                ret = dwin_watch_start();
-                if(ret != RT_EOK)
-                {
-                    DWIN_DBG("Failed to start watch after write var.\n"); 
-                    return ret; 
-                }
-                
-                return RT_ERROR; 
-            }
-            else
-            {
-                break; 
-            }
-        }
-    }
-    
-    ret = dwin_watch_start();
-    if(ret != RT_EOK)
-    {
-        DWIN_DBG("Failed to start watch after write var.\n"); 
-        return ret; 
-    }
-    
     return RT_EOK; 
 }
+
 #endif
 
 /* The dwin DGUSI ops */ 
@@ -790,9 +724,18 @@ rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 {
     uint8_t index = 0; 
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[6] = {0}; 
     
     RT_ASSERT(len >= 1); 
     RT_ASSERT(data != RT_NULL); 
+    
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Wite var failed error code: %d\n", ret); 
+        return ret; 
+    }
     
     /* Send 0x82 Cmd to The DGUS-II Dwin */ 
     dwin_watch_putc(DWIN_USING_HEADH); 
@@ -809,7 +752,7 @@ rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
     }
     
 #ifdef DWIN_USING_DEBUG
-    DWIN_DBG("Wite var \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_DBG("Wite var \033[31m%.3dByte\033[0m data: {", (len*2)+6); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
     DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", (len*2) + 3); 
@@ -824,6 +767,56 @@ rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
     }
     DWIN_USING_PRINT("\b}.\n"); 
 #endif
+    
+    index = 0; 
+    while(1)
+    {
+        rx_data[index++] = dwin_watch_getc(); 
+        
+        if(index == 6) 
+        {
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Response \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            
+            for(index = 0; index < (rx_data[2]+3); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH) || 
+               (rx_data[1] != DWIN_USING_HEADL) || 
+               (rx_data[2] != 3)                || 
+               (rx_data[3] != DWIN_VAR_WRITE)   || 
+               (rx_data[4] != DWIN_DGUSII_ACKH) || 
+               (rx_data[5] != DWIN_DGUSII_ACKL))
+            {
+                DWIN_DBG("Write var response valid failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after write var.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
+            }
+            else
+            {
+                break; 
+            }
+        }
+    }
+    
+    ret = dwin_watch_start();
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Failed to start watch after write var.\n"); 
+        return ret; 
+    }
     
     return RT_EOK; 
 }

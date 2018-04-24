@@ -9,7 +9,7 @@
 
 ## 2. 特点介绍
 
-![dwin_debug](https://i.imgur.com/3glSgtV.png)
+![dwin_debug](https://i.imgur.com/XxqIeHJ.png)
 
 ## 2. 编程风格 
 ## 3. 上手指南
