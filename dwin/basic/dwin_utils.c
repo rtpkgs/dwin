@@ -1,5 +1,5 @@
 /*
- * @File:   dwin.h 
+ * @File:   dwin_utils.c 
  * @Author: liu2guang 
  * @Date:   2018-04-22 14:52:10 
  * 
@@ -10,15 +10,5 @@
  * Date           Author       Notes 
  * 2018-04-22     liu2guang    update v2 framework. 
  */ 
-
-#ifndef __DWIN_H__ 
-#define __DWIN_H__ 
-
-#include "dwin_def.h" 
-
-/* low layer */ 
-#include "dwin_trans.h" 
-
-/* component layer */ 
-
-#endif 
+ 
+#include "dwin_utils.h" 

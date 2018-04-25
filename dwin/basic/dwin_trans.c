@@ -1,462 +1,897 @@
 /*
  * @File:   dwin_trans.c 
  * @Author: liu2guang 
- * @Date:   2017-12-08 12:17:48 
+ * @Date:   2018-04-22 14:52:10 
  * 
  * @LICENSE: MIT
  * https://github.com/liu2guang/dwin/blob/master/LICENSE
  * 
  * Change Logs: 
  * Date           Author       Notes 
- * 2017-12-08     liu2guang    实现主动询问与自动上传数据解耦. 
+ * 2018-04-22     liu2guang    update v2 framework. 
  */ 
+ 
 #include "dwin_trans.h" 
-#include "dwin_paser.h" 
 
-/* 自动上传数据监听器接收状态枚
-   举, 内部使用 */
-enum input_state
+/* Trans cmd */ 
+#define DWIN_REG_WRITE (0x80)
+#define DWIN_REG_READ  (0x81)
+#define DWIN_VAR_WRITE (0x82)
+#define DWIN_VAR_READ  (0x83)
+
+/* DGUSII related */ 
+#define DWIN_DGUSII_ACKH (0x4F) 
+#define DWIN_DGUSII_ACKL (0x4B) 
+
+static struct dwin_watch watch; 
+
+static rt_err_t dwin_watch_putc(uint8_t ch)
 {
-    STATE_NORMAL = 0,
-    STATE_DATA_HEAD_H,
-    STATE_DATA_HEAD_L,
-    STATE_GET_DATA
-};
-
-/* 自动上传数据监听器相关数据, 
-   rx同步信号, 监听器线程, 串口
-   设备, 内部使用 */
-static rt_sem_t    dwin_uart_rxsem;
-static rt_thread_t dwin_uart_watch;
-static rt_device_t dwin_uart_device;
-
-/* 串口直接发送与阻塞接收, 内部使用 */
-static uint8_t dwin_putc(uint8_t ch);
-static uint8_t dwin_getc(void);
-
-/* 串口发送字节, 内部使用 */
-static uint8_t dwin_putc(uint8_t ch)
-{
-    uint8_t ret = dwin_err_none;
-    if(rt_device_write(dwin_uart_device, (-1), &ch, 1) != 1)
+    rt_err_t ret = RT_EOK; 
+    
+    if(rt_device_write(watch.serial, (-1), &ch, 1) != 1)
     {
-        ret = dwin_err_error;
+        ret = RT_EFULL; 
     }
+    
     return ret;
 }
 
-/* 串口阻塞接收字节, 内部使用 */
-static uint8_t dwin_getc(void)
+static uint8_t dwin_watch_getc(void)
 {
-    uint8_t ch;
-    while(rt_device_read(dwin_uart_device, (-1), &ch, 1) != 1)
+    uint8_t ch; 
+    
+    while(rt_device_read(watch.serial, (-1), &ch, 1) != 1)
     {
-        rt_sem_take(dwin_uart_rxsem, RT_WAITING_FOREVER);
+        rt_sem_take(watch.rxsem, RT_WAITING_FOREVER);
     }
+
     return ch;
 }
 
-/* 串口接收回调函数, 内部使用 */
-static rt_err_t dwin_uart_rxcb(rt_device_t dev, rt_size_t size)
+static rt_err_t dwin_watch_rxcb(rt_device_t dev, rt_size_t size)
 {
-    return rt_sem_release(dwin_uart_rxsem);
+    return rt_sem_release(watch.rxsem);
 }
 
-/* 自动上传监听器处理线程, 内部使用 */
-static void dwin_autoupload_watch(void *p)
+static void dwin_watch_run(void *p)
 {
-    uint8_t ch;
-    uint8_t state = STATE_NORMAL;
-    uint8_t index = 0;
-    uint8_t data[256] = {0};
+    uint8_t ch = 0; 
+    uint8_t index = 0; 
+    dwin_watch_state_t state = DWIN_WATCH_STATE_IDLE; 
     
-    for(;;)
+    while(1)
     {
-        ch = dwin_getc();
+        ch = dwin_watch_getc(); 
         
-        /* 监听器识别到数据帧头高字节 */
-        if(state == STATE_NORMAL)
+        /* Watch listen to the frame header high byte */ 
+        if(state == DWIN_WATCH_STATE_IDLE) 
         {
-            if(ch == PKG_DWIN_HEAD_H)
+            if(ch == DWIN_USING_HEADH) 
             {
-                data[index++] = ch; 
-                state = STATE_DATA_HEAD_H;
+                watch.data[index++] = ch; 
+                state = DWIN_WATCH_STATE_HEADH; 
+                continue; 
+            }
+            else
+            {
+                index = 0; 
+                state = DWIN_WATCH_STATE_IDLE; 
                 continue;
             }
-            
-            /* 错误数据帧处理:丢弃之前采集数据 */
-            index = 0;
-            state = STATE_NORMAL;
-            continue;
         }
         
-        /* 监听器识别到数据帧头低字节 */
-        if(state == STATE_DATA_HEAD_H)
+        /* Watch listen to the frame header low byte */ 
+        if(state == DWIN_WATCH_STATE_HEADH)
         {
-            if(ch == PKG_DWIN_HEAD_L)
+            if(ch == DWIN_USING_HEADL)
             {
-                data[index++] = ch;
-                state = STATE_DATA_HEAD_L;
+                watch.data[index++] = ch; 
+                state = DWIN_WATCH_STATE_HEADL;
                 continue;
             }
-            
-            /* 错误数据帧处理:丢弃之前采集数据 */
-            index = 0;
-            state = STATE_NORMAL;
-            continue;
-        }
-        
-        /* 监听器获取数据帧长度 */
-        if(state == STATE_DATA_HEAD_L)
-        {
-            /* 调试打印, 打印监听器识别到的数据帧长度 */
-#if (PKG_DWIN_DEBUG >= 2)
-            dwin_print(PKG_DWIN_PROMPT);
-            dwin_print("Listen to %dbyte data frame:", ch+3);
-#endif
-            data[index++] = ch;
-            state = STATE_GET_DATA;
-            continue;
-        }
-        
-        /* 监听器获取数据帧数据 */
-        if(state == STATE_GET_DATA)
-        {
-            data[index++] = ch;
-            
-            /* 判断数是否完成接收 */
-            if(index == data[2] + 3)
+            else
             {
-                /* 监听器接收数据帧打印 */
-#if (PKG_DWIN_DEBUG >= 2)
-                dwin_print("{");
-                for(index = 0; index < (data[2]+3); index++)
-                {
-                    dwin_print("0x%.2x ", data[index]);
-                }
-                dwin_print("\b}\n");
-#endif
-                
-                /* 数据帧解析, 这里采用直接调用会不
-                   会影响监听器的数据接收能力, 如果
-                   使用邮箱传递信息, 或者信号量传递
-                   进行同步会不会造成解析器还未完成
-                   解析又有数据被监听到了, 会不会造
-                   成丢数据, 这里需要重点测试, 优化 */
-                dwin_paser(data, data[2]);
-
-                /* 数据帧识别完成, 清空变量, 等待下次数据监听 */
                 index = 0;
-                state = STATE_NORMAL;
-                rt_memset(data, 0, 256);
+                state = DWIN_WATCH_STATE_IDLE;
+                continue;
+            }
+        }
+        
+        if(state == DWIN_WATCH_STATE_HEADL)
+        {
+            watch.data[index++] = ch;
+            state = DWIN_WATCH_STATE_DATE;
+            continue;
+        }
+        
+        if(state == DWIN_WATCH_STATE_DATE)
+        {
+            watch.data[index++] = ch; 
+            
+            if(index == watch.data[2] + 3)
+            {
+#ifdef DWIN_USING_DEBUG
+                DWIN_DBG("Listen to \033[31m%.3dByte\033[0m data: {", watch.data[2]+3); 
+
+                for(index = 0; index < (watch.data[2]+3); index++) 
+                {
+                    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", watch.data[index]); 
+                }
+                DWIN_USING_PRINT("\b}.\n");
+#endif
+                /* Data parse */ 
+                // DWIN_DBG("Start parse.\n"); 
+                
+                index = 0;
+                state = DWIN_WATCH_STATE_IDLE;
+                rt_memset(watch.data, 0x00, sizeof(watch.data));
+                
                 continue;
             }
         }
     }
 }
 
-/* 启动自动上传监听器处理线程 */
-static uint8_t dwin_watch_start(void)
+static rt_err_t dwin_watch_start(void) 
 {
-    /* 创建监听器线程 */ 
-    dwin_uart_watch = rt_thread_create("twatch", dwin_autoupload_watch,  
-        RT_NULL, 2048, PKG_DWIN_WATCH_PRIO, 10); 
-    if(dwin_uart_watch == RT_NULL) 
+    /* Create the watch thread */ 
+    watch.thread = rt_thread_create("twatch", dwin_watch_run, RT_NULL, 2048, 6, 10); 
+    if(watch.thread == RT_NULL) 
     {
-        dwin_println("dwin auto upload thread create failed"); 
-        return dwin_err_error; 
+        DWIN_DBG("Dwin auto upload watch thread create failed.\n"); 
+        return RT_ENOSYS; 
     }
 
-    /* 启动监听器线程 */ 
-    rt_thread_startup(dwin_uart_watch); 
-    return dwin_err_none; 
+    /* Start the watch thread */ 
+    rt_thread_startup(watch.thread); 
+    
+    return RT_EOK; 
 }
 
-/* 暂停自动上传监测器处理 */
-static uint8_t dwin_watch_stop(void)
+static rt_err_t dwin_watch_stop(void)
 {
     rt_err_t ret = RT_EOK;
     
-    /* 删除监听器线程 */ 
-    ret = rt_thread_delete(dwin_uart_watch);
+    /* Delete the watch thread */ 
+    ret = rt_thread_delete(watch.thread); 
     if(ret != RT_EOK)
     {
-        dwin_println("dwin auto upload thread delete failed"); 
-        return dwin_err_error; 
+        DWIN_DBG("Dwin auto upload watch thread delete failed.\n"); 
+        return RT_ENOSYS; 
     }
     
-    return dwin_err_none;
+    return RT_EOK;
 }
 
-/* 自动上传监测器初始化 */
-uint8_t dwin_watch_init(const char *name, uint32_t baudrate)
-{
-    rt_err_t ret = RT_EOK;
-    struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;
-    
-    RT_ASSERT(name != RT_NULL);
-    
-    /* 查找设备 */
-    dwin_uart_device = rt_device_find(name);
-    if(dwin_uart_device == RT_NULL)
-    {
-        dwin_println("%s device dont found", name);
-        return dwin_err_error;
-    }
-    
-    /* 修改设备波特率 */
-    config.baud_rate = baudrate;
-    rt_device_control(dwin_uart_device, RT_DEVICE_CTRL_CONFIG, (void *)&config);
-    
-    /* 打开设备 */
-    ret = rt_device_open(dwin_uart_device, RT_DEVICE_OFLAG_RDWR | 
-        RT_DEVICE_FLAG_INT_RX);
-    if(ret != RT_EOK)
-    {
-        dwin_uart_device = RT_NULL;
-        dwin_println("%s device open failed", name);
-        return dwin_err_error;
-    }
-    else
-    {
-        /* 设置串口回调函数 */
-        rt_device_set_rx_indicate(dwin_uart_device, dwin_uart_rxcb);
-    }
-    
-    /* 创建串口接收异步处理信号量 */
-    dwin_uart_rxsem = rt_sem_create("dwinrxsem", 0, RT_IPC_FLAG_FIFO);
-    if(dwin_uart_rxsem == RT_NULL)
-    {
-        rt_device_set_rx_indicate(dwin_uart_device, NULL);
-        rt_device_close(dwin_uart_device);
-        dwin_uart_device = RT_NULL;
-        dwin_println("dwin uart rxsem create failed");
-        return dwin_err_error;
-    }
-    
-    /* 启动监听器 */
-    if(dwin_watch_start() != dwin_err_none)
-    {
-        rt_sem_delete(dwin_uart_rxsem);
-        rt_device_set_rx_indicate(dwin_uart_device, NULL);
-        rt_device_close(dwin_uart_device);
-        dwin_uart_device = RT_NULL;
-        dwin_println("dwin uart rxsem create failed");
-        return dwin_err_error;
-    }
-    
-    return dwin_err_none;
-}
-
-/* 写变量 */
-uint8_t dwin_var_write(uint16_t addr, uint16_t *data, uint8_t len)
-{
-    uint8_t index;
-    
-    RT_ASSERT(data != RT_NULL);
-    RT_ASSERT(len  != 0);
-    
-     /* 发送写变量请求 */
-    dwin_putc(PKG_DWIN_HEAD_H);
-    dwin_putc(PKG_DWIN_HEAD_L);
-    dwin_putc((len*2) + 3);
-    dwin_putc(DWIN_VAR_WRITE);
-    dwin_putc((addr & 0xFF00) >> 8);
-    dwin_putc((addr & 0x00FF) >> 0);
-
-    for(index = 0; index < len; index++)
-    {
-        dwin_putc((data[index] & 0xFF00) >> 8);
-        dwin_putc((data[index] & 0x00FF) >> 0);
-    }
-    
-    /* 调试信息 */
-#if (PKG_DWIN_DEBUG >= 2)
-    dwin_print(PKG_DWIN_PROMPT);
-    dwin_print("write [0x%.4x] var [%dbyte]:", addr, len*2);
-
-    dwin_print("{");
-    for(index = 0; index < len; index++)
-    {
-        dwin_print("0x%.4x ", data[index]);
-    }
-    dwin_print("\b}\n");
-#endif
-    
-    return dwin_err_none;
-}
-
-/* 读变量 */
-uint8_t dwin_var_read(uint16_t addr, uint16_t *data, uint8_t len)
+/* The dwin miniDGUS ops */ 
+#if (DWIN_USING_MODEL == 0)
+rt_err_t dwin_reg_read(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len)
 {
     uint8_t index = 0;
-    uint8_t rx_data[256] = {0};
-    uint8_t ret = dwin_err_none;
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[256] = {0}; 
+    
+    RT_ASSERT(len  != 0); 
+    RT_ASSERT(data != RT_NULL); 
 
-    /* 停止监听器 */
-    ret = dwin_watch_stop();
-    if(ret != dwin_err_none)
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
     {
-        return dwin_err_error; 
+        DWIN_DBG("Read reg failed error code: %d\n", ret); 
+        return ret; 
     }
     
-    /* 发送读变量请求 */
-    dwin_putc(PKG_DWIN_HEAD_H);
-    dwin_putc(PKG_DWIN_HEAD_L);
-    dwin_putc(4);
-    dwin_putc(DWIN_VAR_READ);
-    dwin_putc((addr & 0xFF00) >> 8);
-    dwin_putc((addr & 0x00FF) >> 0);
-    dwin_putc(len);
+    /* Send 0x80 Cmd to The miniDGUS Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc(3); 
+    dwin_watch_putc(DWIN_REG_READ); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
+    dwin_watch_putc(len); 
     
-    /* 阻塞式等待数据 */
-    for(;;)
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Requests \033[31m%.3dByte\033[0m data: {", 6); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", 4); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_REG_READ); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m}.\n", len); 
+#endif
+    
+    /* Blocking waits for data */ 
+    while(1)
     {
-        /* 接收数据 */
-        rx_data[index++] = dwin_getc();
+        rx_data[index++] = dwin_watch_getc();
+        
+        if(index == len+6) 
+        {
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Read reg \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            
+            for(index = 0; index < (len+6); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH)     || 
+               (rx_data[1] != DWIN_USING_HEADL)     || 
+               (rx_data[2] != (len+3))              || 
+               (rx_data[3] != DWIN_REG_READ)        || 
+               (rx_data[4] != DWIN_GET_BYTEL(addr)) || 
+               (rx_data[5] != len))
+            {
+                DWIN_DBG("Read reg data Validation failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after read reg.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
+            }
+            else
+            {
+                rt_memcpy(data, &rx_data[6], len); 
+                break; 
+            }
+        }
+    }
+    
+    ret = dwin_watch_start();
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Failed to start watch after read reg.\n"); 
+        return ret; 
+    }
+    
+    return RT_EOK; 
+}
+
+rt_err_t dwin_reg_write(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len)
+{
+    uint8_t index = 0; 
+    
+    RT_ASSERT(len  != 0);  
+    RT_ASSERT(data != RT_NULL); 
+    
+    /* Send 0x80 Cmd to The miniDGUS Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc(len + 2); 
+    dwin_watch_putc(DWIN_REG_WRITE); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        dwin_watch_putc(data[index]);
+    }
+    
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Wite reg \033[31m%.3dByte\033[0m data: {", 6); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", len + 2); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_REG_WRITE); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", data[index]); 
+    }
+    DWIN_USING_PRINT("\b}.\n"); 
+#endif
+    
+    return RT_EOK; 
+}
+
+rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
+{
+    uint8_t index = 0;
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[256] = {0}; 
+    
+    RT_ASSERT((len >= 1) && (len <= 0x7F)); 
+    RT_ASSERT(data != RT_NULL); 
+    
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Read var failed error code: %d\n", ret); 
+        return ret; 
+    }
+    
+    /* Send 0x83 Cmd to The DGUS-II Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc(4); 
+    dwin_watch_putc(DWIN_VAR_READ); 
+    dwin_watch_putc(DWIN_GET_BYTEH(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
+    dwin_watch_putc(len); 
+    
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Requests \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", 4); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_VAR_READ); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m}.\n", len); 
+#endif
+    
+    /* Blocking waits for data */ 
+    while(1)
+    {
+        rx_data[index++] = dwin_watch_getc(); 
         
         if(index == (len*2+7))
         {
-            /* 识别接收数据是否合理 */
-            if((rx_data[0] != PKG_DWIN_HEAD_H)  || (rx_data[1] != PKG_DWIN_HEAD_L)  || 
-               (rx_data[2] != (len*2+4))        || (rx_data[3] != DWIN_VAR_READ)    || 
-               (rx_data[4] != (addr&0xFF00)>>8) || (rx_data[5] != (addr&0x00FF)>>0) ||
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Read var \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            
+            for(index = 0; index < (len*2+7); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH)     || 
+               (rx_data[1] != DWIN_USING_HEADL)     || 
+               (rx_data[2] != (len*2+4))            || 
+               (rx_data[3] != DWIN_VAR_READ)        || 
+               (rx_data[4] != DWIN_GET_BYTEH(addr)) || 
+               (rx_data[5] != DWIN_GET_BYTEL(addr)) || 
                (rx_data[6] != len))
             {
-                ret = dwin_err_error;
-                rt_memset(data, 0, len*2+7);
-                break;
+                DWIN_DBG("Read var data Validation failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after read var.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
             }
-            
-            /* 字符流数据转换为uint16_t数据 */
-            for(index = 7; index < (len*2+7); index+=2)
+            else
             {
-                data[(index-7)/2] = (rx_data[index]<<8) + rx_data[index + 1];
+                for(index = 7; index < (len*2+7); index+=2)
+                {
+                    data[(index-7)/2] = (rx_data[index]<<8) + rx_data[index + 1];
+                }
+                break; 
             }
-            
-            ret = dwin_err_none;
-            break;
         }
     }
     
-    /* 调试信息打印 */
-#if (PKG_DWIN_DEBUG >= 2)
-    dwin_print(PKG_DWIN_PROMPT);
-    dwin_print("user readvar [%dByte]:{", len);
-    for(index = 0; index < (len*2+7); index++)
-    {
-        dwin_print("0x%.2x ", rx_data[index]);
-    }
-    dwin_print("\b}\n");
-#endif
-    
-    /* 启动监听器 */
     ret = dwin_watch_start();
-    if(ret != dwin_err_none)
+    if(ret != RT_EOK)
     {
-        return dwin_err_error; 
+        DWIN_DBG("Failed to start watch after read var.\n"); 
+        return ret; 
     }
     
-    return dwin_err_none;
+    return RT_EOK; 
 }
 
-/* 写寄存器 */
-uint8_t dwin_reg_write(uint8_t addr, uint8_t *data, uint8_t len)
+rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
 {
-    uint8_t index;
+    uint8_t index = 0; 
     
-    RT_ASSERT(data != RT_NULL);
-    RT_ASSERT(len  != 0);
+    RT_ASSERT(len >= 1); 
+    RT_ASSERT(data != RT_NULL); 
     
-    /* 发送写寄存器指令 */
-    dwin_putc(PKG_DWIN_HEAD_H);
-    dwin_putc(PKG_DWIN_HEAD_L);
-    dwin_putc(len + 2);
-    dwin_putc(DWIN_REG_WRITE);
-    dwin_putc(addr);
+    /* Send 0x82 Cmd to The DGUS-II Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc((len*2) + 3); 
+    dwin_watch_putc(DWIN_VAR_WRITE); 
+    dwin_watch_putc(DWIN_GET_BYTEH(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
     
     for(index = 0; index < len; index++)
     {
-        dwin_putc(data[index]);
+        dwin_watch_putc(DWIN_GET_BYTEH(data[index]));
+        dwin_watch_putc(DWIN_GET_BYTEL(data[index]));
     }
     
-#if (PKG_DWIN_DEBUG >= 2)
-    dwin_print(PKG_DWIN_PROMPT);
-    dwin_print("user write [0x%.2x] reg [%dbyte]:", addr, len);
-
-    dwin_print("{");
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Wite var \033[31m%.3dByte\033[0m data: {", (len*2)+6); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", (len*2) + 3); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_VAR_WRITE); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    
     for(index = 0; index < len; index++)
     {
-        dwin_print("0x%.2x ", data[index]);
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(data[index])); 
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(data[index])); 
     }
-    dwin_print("\b}\n");
+    DWIN_USING_PRINT("\b}.\n"); 
 #endif
     
-    return dwin_err_none;
+    return RT_EOK; 
 }
 
-/* 读寄存器 */
-uint8_t dwin_reg_read(uint8_t addr, uint8_t *data, uint8_t len)
+#endif
+
+/* The dwin DGUSI ops */ 
+#if (DWIN_USING_MODEL == 1)
+rt_err_t dwin_reg_read (rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len); 
+rt_err_t dwin_reg_write(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len); 
+rt_err_t dwin_var_read (rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len); 
+rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len); 
+#endif
+
+/* The dwin DGUSII ops */ 
+#if (DWIN_USING_MODEL == 2)
+rt_err_t dwin_reg_read(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len)
 {
     uint8_t index = 0;
-    uint8_t rx_data[256] = {0};
-    uint8_t ret = dwin_err_none;
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[256] = {0}; 
     
-    /* 停止监听器 */
-    ret = dwin_watch_stop();
-    if(ret != dwin_err_none)
+    RT_ASSERT(len  != 0); 
+    RT_ASSERT(data != RT_NULL); 
+
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
     {
-        return dwin_err_error; 
+        DWIN_DBG("Read reg failed error code: %d\n", ret); 
+        return ret; 
     }
     
-    /* 发送读寄存器请求命令 */
-    dwin_putc(PKG_DWIN_HEAD_H);
-    dwin_putc(PKG_DWIN_HEAD_L);
-    dwin_putc(3);
-    dwin_putc(DWIN_REG_READ);
-    dwin_putc(addr);
-    dwin_putc(len);
+    /* Send 0x80 Cmd to The DGUS-II Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc(4); 
+    dwin_watch_putc(DWIN_REG_READ); 
+    dwin_watch_putc(DWIN_GET_BYTEH(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
+    dwin_watch_putc(len); 
     
-    /* 阻塞式等待数据 */
-    for(;;)
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Requests \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", 4); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_REG_READ); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m}.\n", len); 
+#endif
+    
+    /* Blocking waits for data */ 
+    while(1)
     {
-        rx_data[index++] = dwin_getc();
+        rx_data[index++] = dwin_watch_getc();
         
-        if(index == (len+6))
+        if(index == len+7) 
         {
-            /* 接收数据 */
-            if((rx_data[0] != PKG_DWIN_HEAD_H) || (rx_data[1] != PKG_DWIN_HEAD_L) || 
-               (rx_data[2] != (len+3))         || (rx_data[3] != DWIN_REG_READ)   || 
-               (rx_data[4] != addr)            || (rx_data[5] != len))
-            {
-                ret = dwin_err_error;
-                rt_memset(rx_data, 0, len+6);
-                break;
-            }
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Read reg \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
             
-            /* 拷贝数据到用户buffer */
-            rt_memcpy(data, &rx_data[6], len);
-            ret = dwin_err_none;
-            break;
+            for(index = 0; index < (len+7); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH)           || 
+               (rx_data[1] != DWIN_USING_HEADL)           || 
+               (rx_data[2] != (len+4))                    || 
+               (rx_data[3] != DWIN_REG_READ)              || 
+               (rx_data[4] != DWIN_GET_BYTEH(addr)) || 
+               (rx_data[5] != DWIN_GET_BYTEL(addr)) || 
+               (rx_data[6] != len))
+            {
+                DWIN_DBG("Read reg data Validation failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after read reg.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
+            }
+            else
+            {
+                rt_memcpy(data, &rx_data[7], len); 
+                break; 
+            }
         }
     }
     
-    /* 调试信息 */
-#if (PKG_DWIN_DEBUG >= 2)
-    dwin_print(PKG_DWIN_PROMPT);
-    dwin_print("user readreg [%dByte]:{", len);
-    for(index = 0; index < (len+6); index++)
+    ret = dwin_watch_start();
+    if(ret != RT_EOK)
     {
-        dwin_print("0x%.2x ", rx_data[index]);
+        DWIN_DBG("Failed to start watch after read reg.\n"); 
+        return ret; 
     }
-    dwin_print("\b}\n");
+    
+    return RT_EOK; 
+}
+
+rt_err_t dwin_reg_write(rt_uint16_t addr, rt_uint8_t *data, rt_uint8_t len)
+{
+    uint8_t index = 0; 
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[6] = {0}; 
+    
+    RT_ASSERT(len  != 0);  
+    RT_ASSERT(data != RT_NULL); 
+    
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Wite reg failed error code: %d\n", ret); 
+        return ret; 
+    }
+    
+    /* Send 0x80 Cmd to The DGUS-II Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc(len + 3); 
+    dwin_watch_putc(DWIN_REG_WRITE); 
+    dwin_watch_putc(DWIN_GET_BYTEH(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        dwin_watch_putc(data[index]);
+    }
+    
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Wite reg \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", len + 3); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_REG_WRITE); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", data[index]); 
+    }
+    DWIN_USING_PRINT("\b}.\n"); 
 #endif
     
-    ret = dwin_watch_start();
-    if(ret != dwin_err_none)
+    index = 0; 
+    while(1) 
     {
-        return dwin_err_error; 
+        rx_data[index++] = dwin_watch_getc(); 
+        
+        if(index == 6) 
+        {
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Response \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            
+            for(index = 0; index < (rx_data[2]+3); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH) || 
+               (rx_data[1] != DWIN_USING_HEADL) || 
+               (rx_data[2] != 3)                || 
+               (rx_data[3] != DWIN_REG_WRITE)   || 
+               (rx_data[4] != DWIN_DGUSII_ACKH) || 
+               (rx_data[5] != DWIN_DGUSII_ACKL))
+            {
+                DWIN_DBG("Write reg response valid failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after write reg.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
+            }
+            else
+            {
+                break; 
+            }
+        }
     }
     
-    return dwin_err_none;
+    ret = dwin_watch_start();
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Failed to start watch after write var.\n"); 
+        return ret; 
+    }
+    
+    return RT_EOK; 
+}
+
+rt_err_t dwin_var_read(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
+{
+    uint8_t index = 0;
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[256] = {0}; 
+    
+    RT_ASSERT((len >= 1) && (len <= 0x7D)); 
+    RT_ASSERT(data != RT_NULL); 
+    
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Read var failed error code: %d\n", ret); 
+        return ret; 
+    }
+    
+    /* Send 0x83 Cmd to The DGUS-II Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc(4); 
+    dwin_watch_putc(DWIN_VAR_READ); 
+    dwin_watch_putc(DWIN_GET_BYTEH(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
+    dwin_watch_putc(len); 
+    
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Requests \033[31m%.3dByte\033[0m data: {", 7); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", 4); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_VAR_READ); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m}.\n", len); 
+#endif
+    
+    /* Blocking waits for data */ 
+    while(1)
+    {
+        rx_data[index++] = dwin_watch_getc(); 
+        
+        if(index == (len*2+7))
+        {
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Read var \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            
+            for(index = 0; index < (rx_data[2]+3); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH)     || 
+               (rx_data[1] != DWIN_USING_HEADL)     || 
+               (rx_data[2] != (len*2+4))            || 
+               (rx_data[3] != DWIN_VAR_READ)        || 
+               (rx_data[4] != DWIN_GET_BYTEH(addr)) || 
+               (rx_data[5] != DWIN_GET_BYTEL(addr)) || 
+               (rx_data[6] != len))
+            {
+                DWIN_DBG("Read var data Validation failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after read var.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
+            }
+            else
+            {
+                for(index = 7; index < (len*2+7); index+=2)
+                {
+                    data[(index-7)/2] = (rx_data[index]<<8) + rx_data[index + 1];
+                }
+                break; 
+            }
+        }
+    }
+    
+    ret = dwin_watch_start();
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Failed to start watch after read var.\n"); 
+        return ret; 
+    }
+    
+    return RT_EOK; 
+}
+
+rt_err_t dwin_var_write(rt_uint16_t addr, rt_uint16_t *data, rt_uint8_t len)
+{
+    uint8_t index = 0; 
+    rt_err_t ret = RT_EOK; 
+    uint8_t rx_data[6] = {0}; 
+    
+    RT_ASSERT(len >= 1); 
+    RT_ASSERT(data != RT_NULL); 
+    
+    ret = dwin_watch_stop(); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Wite var failed error code: %d\n", ret); 
+        return ret; 
+    }
+    
+    /* Send 0x82 Cmd to The DGUS-II Dwin */ 
+    dwin_watch_putc(DWIN_USING_HEADH); 
+    dwin_watch_putc(DWIN_USING_HEADL); 
+    dwin_watch_putc((len*2) + 3); 
+    dwin_watch_putc(DWIN_VAR_WRITE); 
+    dwin_watch_putc(DWIN_GET_BYTEH(addr)); 
+    dwin_watch_putc(DWIN_GET_BYTEL(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        dwin_watch_putc(DWIN_GET_BYTEH(data[index]));
+        dwin_watch_putc(DWIN_GET_BYTEL(data[index]));
+    }
+    
+#ifdef DWIN_USING_DEBUG
+    DWIN_DBG("Wite var \033[31m%.3dByte\033[0m data: {", (len*2)+6); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADH); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_USING_HEADL); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", (len*2) + 3); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_VAR_WRITE); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(addr)); 
+    DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(addr)); 
+    
+    for(index = 0; index < len; index++)
+    {
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEH(data[index])); 
+        DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", DWIN_GET_BYTEL(data[index])); 
+    }
+    DWIN_USING_PRINT("\b}.\n"); 
+#endif
+    
+    index = 0; 
+    while(1)
+    {
+        rx_data[index++] = dwin_watch_getc(); 
+        
+        if(index == 6) 
+        {
+#ifdef DWIN_USING_DEBUG
+            DWIN_DBG("Response \033[31m%.3dByte\033[0m data: {", rx_data[2]+3); 
+            
+            for(index = 0; index < (rx_data[2]+3); index++) 
+            {
+                DWIN_USING_PRINT("\033[32m0x%.2x\033[0m ", rx_data[index]); 
+            }
+            DWIN_USING_PRINT("\b}.\n");
+#endif
+            
+            /* Validate response data */ 
+            if((rx_data[0] != DWIN_USING_HEADH) || 
+               (rx_data[1] != DWIN_USING_HEADL) || 
+               (rx_data[2] != 3)                || 
+               (rx_data[3] != DWIN_VAR_WRITE)   || 
+               (rx_data[4] != DWIN_DGUSII_ACKH) || 
+               (rx_data[5] != DWIN_DGUSII_ACKL))
+            {
+                DWIN_DBG("Write var response valid failed.\n"); 
+                
+                ret = dwin_watch_start();
+                if(ret != RT_EOK)
+                {
+                    DWIN_DBG("Failed to start watch after write var.\n"); 
+                    return ret; 
+                }
+                
+                return RT_ERROR; 
+            }
+            else
+            {
+                break; 
+            }
+        }
+    }
+    
+    ret = dwin_watch_start();
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Failed to start watch after write var.\n"); 
+        return ret; 
+    }
+    
+    return RT_EOK; 
+}
+#endif /* DWIN_USING_MODEL == 2 */ 
+
+rt_err_t dwin_watch_init(dwin_t dwin, const char *name, rt_uint32_t baudrate)
+{
+    rt_err_t ret = RT_EOK; 
+    
+    RT_ASSERT(dwin != RT_NULL); 
+    RT_ASSERT(name != RT_NULL); 
+    
+    /* Init watch struct */ 
+    rt_memset(&watch, 0x00, sizeof(struct dwin_watch)); 
+    dwin->watch = &watch; 
+    
+    /* Find uart device */ 
+    dwin->watch->serial = rt_device_find(name); 
+    if(dwin->watch->serial == RT_NULL)
+    {
+        DWIN_DBG("No found %s device.\n", name); 
+        return RT_ENOSYS; 
+    }
+    else
+    {
+        DWIN_DBG("Found %s device.\n", name); 
+    }
+    
+    /* Config uart */ 
+    struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT; 
+    
+    config.baud_rate = baudrate; 
+    rt_device_control(dwin->watch->serial, RT_DEVICE_CTRL_CONFIG, (void *)&config); 
+    
+    /* Open device */ 
+    ret = rt_device_open(dwin->watch->serial, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_INT_RX); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Open %s device failed error code: %d.\n", ret); 
+        return RT_ENOSYS; 
+    }
+    else
+    {
+        DWIN_DBG("Open %s device succeed.\n", name); 
+    }
+    
+    /* Set the serial port callback function */ 
+    rt_device_set_rx_indicate(dwin->watch->serial, dwin_watch_rxcb); 
+    
+    /* Create a serial to receive asynchronous processing semaphore */ 
+    dwin->watch->rxsem = rt_sem_create("dwin_rx", 0, RT_IPC_FLAG_FIFO); 
+    if(dwin->watch->rxsem == RT_NULL)
+    {
+        rt_device_set_rx_indicate(dwin->watch->serial, RT_NULL);
+        rt_device_close(dwin->watch->serial);
+        
+        dwin->watch->serial = RT_NULL;
+        DWIN_DBG("Serial rx sem create failed.\n"); 
+        
+        return RT_ENOSYS;
+    }
+    
+    /* Start watch */ 
+    ret = dwin_watch_start(); 
+    if(ret != RT_EOK)
+    {
+        rt_sem_delete(dwin->watch->rxsem); 
+        rt_device_set_rx_indicate(dwin->watch->serial, RT_NULL); 
+        rt_device_close(dwin->watch->serial); 
+        
+        dwin->watch->serial = RT_NULL;
+        DWIN_DBG("Watch start failed error code: %d\n", ret); 
+        
+        return ret; 
+    }
+    
+    return RT_EOK; 
 }

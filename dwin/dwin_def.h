@@ -1,111 +1,93 @@
-#ifndef __DWIN_DEF_H_ 
-#define __DWIN_DEF_H_ 
+/*
+ * @File:   dwin_def.h 
+ * @Author: liu2guang 
+ * @Date:   2018-04-22 14:52:10 
+ * 
+ * @LICENSE: MIT
+ * https://github.com/liu2guang/dwin/blob/master/LICENSE
+ * 
+ * Change Logs: 
+ * Date           Author       Notes 
+ * 2018-04-22     liu2guang    update v2 framework. 
+ */ 
 
-#include <stdbool.h>
-#include <rtthread.h>
-#include <rtdevice.h>
+#ifndef __DWIN_DEF_H__ 
+#define __DWIN_DEF_H__ 
 
-/* 插件头文件 */
-#if defined(PKG_DWIN_ENABLE_PLUGIN_ICON)
-#include "dwin_plugin_icon.h" 
-#endif
-#if defined(PKG_DWIN_ENABLE_PLUGIN_BUTTON) 
-#include "dwin_plugin_button.h" 
-#endif
-#if defined(PKG_DWIN_ENABLE_PLUGIN_TEXTBOX)
-#include "dwin_plugin_textbox.h" 
-#endif
-#if defined(PKG_DWIN_ENABLE_PLUGIN_INPUTBOX)
-#include "dwin_plugin_inputbox.h" 
-#endif
-#include "dwin_number.h" /* TODO */
+#include "rtthread.h"
+#include "rtdevice.h" 
 
-#include "dwin_system.h" 
-
-/* dwin version information */
-#define DWIN_MAJOR_VER      1L          /* major version number  */
-#define DWIN_MINOR_VER      4L          /* minor version number  */
-#define DWIN_REVISE_VER     2L          /* revise version number */
-#define DWIN_VERSION        ((DWIN_MAJOR_VER*10000) + (DWIN_MINOR_VER*100) + DWIN_REVISE_VER)
-
-/* dwin config */
-/* transport framehead high byte */
-#ifndef PKG_DWIN_HEAD_H
-#define PKG_DWIN_HEAD_H (0x5A)
+/* Default config */ 
+#ifndef DWIN_USING_MODEL
+#error "Please define 'DWIN_USING_MODEL' macro!" 
 #endif
 
-/* transport framehead low byte */
-#ifndef PKG_DWIN_HEAD_L
-#define PKG_DWIN_HEAD_L (0xA5)
+#ifndef DWIN_USING_UART
+#error "Please define 'DWIN_USING_UART' macro!" 
 #endif
 
-#ifndef PKG_DWIN_VAR_MAX_BYTE
-#define PKG_DWIN_VAR_MAX_BYTE (4096)
+#ifndef DWIN_USING_BAUDRATE
+#define DWIN_USING_BAUDRATE 115200
 #endif
 
-/* dwin prompt */
-#ifndef PKG_DWIN_PROMPT
-#define PKG_DWIN_PROMPT "[dwin] "
+#ifndef DWIN_USING_HEADH
+#define DWIN_USING_HEADH 0x5A
+#endif
+#ifndef DWIN_USING_HEADL
+#define DWIN_USING_HEADL 0xA5
 #endif
 
-/* dwin watch thread priority */
-#ifndef PKG_DWIN_WATCH_PRIO
-#define PKG_DWIN_WATCH_PRIO (10)
+#ifndef DWIN_USING_PRINT
+#define DWIN_USING_PRINT rt_kprintf
 #endif
 
-/* dwin space name length */
-#ifndef PKG_DWIN_SPACE_NAME_LEN
-#define PKG_DWIN_SPACE_NAME_LEN (12)
-#endif
+#define DWIN_GET_BYTEH(short) (((short) & 0xFF00) >> 8)
+#define DWIN_GET_BYTEL(short) (((short) & 0x00FF) >> 0)
 
-/* 按键按下值 */
-#ifndef PKG_DWIN_BUTTON_PRESS_VALUE
-#define PKG_DWIN_BUTTON_PRESS_VALUE (0x0D0D)
-#endif
-
-/* dwin macro */
-/* read and write reg/var cmd */
-#define DWIN_REG_READ   (0x81) 
-#define DWIN_REG_WRITE  (0x80) 
-#define DWIN_VAR_READ   (0x83) 
-#define DWIN_VAR_WRITE  (0x82) 
-
-/* dwin debug */
-#ifndef PKG_DWIN_DEBUG
-#define PKG_DWIN_DEBUG 0
-#endif
-
-#if (PKG_DWIN_DEBUG == 0)
-#define dwin_print(...) 
-#define dwin_println(...) 
+/* Debug */ 
+#ifndef DWIN_USING_DEBUG
+#define DWIN_DBG(fmt, ...) 
 #else
-#define dwin_print(...)                 \
-    do{                                 \
-        rt_kprintf(__VA_ARGS__);        \
-    }while(0) 
-#define dwin_println(...)               \
-    do{                                 \
-        rt_kprintf(PKG_DWIN_PROMPT);    \
-        rt_kprintf(__VA_ARGS__);        \
-        rt_kprintf("\n");               \
-    }while(0) 
+#define DWIN_DBG(fmt, ...)                      \
+do{                                             \
+    DWIN_USING_PRINT("[\033[32mdwin\033[0m] "); \
+    DWIN_USING_PRINT(fmt, ##__VA_ARGS__);       \
+}while(0)
 #endif
+    
+/* Info */ 
+#define DWIN_INFO(fmt, ...)                     \
+do{                                             \
+    DWIN_USING_PRINT("[\033[32mdwin\033[0m] "); \
+    DWIN_USING_PRINT(fmt, ##__VA_ARGS__);       \
+}while(0)
 
-#define BITx(n) (1 << n) 
-#define BITS_SET(data, bits)  ((data) |=  (bits))  
-#define BITS_CLR(data, bits)  ((data) &= ~(bits))  
-#define BITS_TGL(data, bits)  ((data) ^=  (bits))  
-#define BITS_READ(data, bits) ((data) &   (bits)) 
-
-/* type define */
-/* error code */
-typedef enum
+enum dwin_watch_state
 {
-    dwin_err_none = 0, 
-    dwin_err_error, 
-    dwin_err_timeout,
-    dwin_err_reinit,
-    dwin_err_para
-} dwin_err_t;
+    DWIN_WATCH_STATE_IDLE = 0, 
+    DWIN_WATCH_STATE_HEADH, 
+    DWIN_WATCH_STATE_HEADL, 
+    DWIN_WATCH_STATE_DATE
+}; 
+typedef enum dwin_watch_state dwin_watch_state_t; 
+
+struct dwin_watch
+{
+    rt_device_t serial; 
+    rt_uint32_t baudrate; 
+    rt_sem_t rxsem; 
+    rt_thread_t thread; 
+    
+    uint8_t data[256]; 
+}; 
+typedef struct dwin_watch *dwin_watch_t; 
+    
+struct dwin
+{
+    dwin_watch_t watch; 
+    
+    rt_bool_t init; 
+}; 
+typedef struct dwin *dwin_t; 
 
 #endif

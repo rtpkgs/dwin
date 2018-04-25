@@ -1,10 +1,21 @@
-#ifndef __DWIN_INIT_H_
-#define __DWIN_INIT_H_
+/*
+ * @File:   dwin_init.c 
+ * @Author: liu2guang 
+ * @Date:   2018-04-22 14:52:10 
+ * 
+ * @LICENSE: MIT
+ * https://github.com/liu2guang/dwin/blob/master/LICENSE
+ * 
+ * Change Logs: 
+ * Date           Author       Notes 
+ * 2018-04-22     liu2guang    update v2 framework. 
+ */ 
 
-#include "dwin_def.h"
+#ifndef __DWIN_INIT_H__ 
+#define __DWIN_INIT_H__ 
 
-/* 外部调用接口 */
-bool dwin_get_init_state(void); 
-uint8_t dwin_init(const char *uart, uint32_t baudrate); 
+#include "dwin_def.h" 
 
-#endif
+int dwin_init(void); 
+
+#endif 

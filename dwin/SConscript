@@ -1,0 +1,20 @@
+from building import * 
+
+# get current dir path
+cwd = GetCurrentDir()
+
+# init src and inc vars
+src = []
+inc = []
+
+# add dwin basic include
+inc = inc + [cwd]
+inc = inc + [cwd + "/basic"]
+
+# add dwin basic code
+src = src + Glob('./*.c')
+src = src + Glob('./basic/*.c')
+
+group = DefineGroup('dwin', src, depend = ['PKG_USING_DWIN'], CPPPATH = inc)
+
+Return('group')
