@@ -14,7 +14,9 @@ before_script:
 
   # 准备RTT BSP用于编译 pwd 当前目录: /home/travis/build/liu2guang/dwin
   - git clone --depth=3 --branch=master https://github.com/RT-Thread/rt-thread.git liu2guang/RT-Thread 
-  - ls -R|egrep /home/travis/build
+  - ls /home/travis/build
+  - ls /home/travis/build/dwin
+  - ls /home/travis/build/RT-Thread
 
 install: 
   - true
