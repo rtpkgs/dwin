@@ -15,11 +15,14 @@ before_script:
   # 准备RTT BSP用于编译 pwd 当前目录: /home/travis/build/liu2guang/dwin
   - git clone --depth=3 --branch=master https://github.com/RT-Thread/rt-thread.git ../RT-Thread 
 
-  - ls /home/travis/build/liu2guang/RT-Thread/
-  - ls /home/travis/build/liu2guang/RT-Thread/bsp/
-  - ls /home/travis/build/liu2guang/RT-Thread/bsp/packages
-  - cp -r /home/travis/build/liu2guang/dwin/ /home/travis/build/liu2guang/RT-Thread/bsp/packages/dwin/
-  - ls /home/travis/build/liu2guang/RT-Thread/bsp/packages
+  # - ls /home/travis/build/liu2guang/RT-Thread/
+  # - ls /home/travis/build/liu2guang/RT-Thread/bsp/
+  # - ls /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/packages
+  - cp -r /home/travis/build/liu2guang/dwin/ /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/packages/dwin/
+  - ls /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/packages
+
+  - export RTT_ROOT=`/home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk`
+  - "[ x$RTT_CC == x ] && export RTT_CC='gcc' || true" 
 
 install: 
   - true
