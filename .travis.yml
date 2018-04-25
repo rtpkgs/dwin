@@ -19,9 +19,9 @@ before_script:
   # - ls /home/travis/build/liu2guang/RT-Thread/bsp/
   # - ls /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/packages
   - mkdir /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/packages
+  - cp /home/travis/build/liu2guang/dwin/tools/rtconfig.h /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/rtconfig.h
   - cp /home/travis/build/liu2guang/dwin/tools/package_tool /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/packages/SConscript
   - cp -r /home/travis/build/liu2guang/dwin /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/packages/dwin
-  - ls /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/packages
 
   - export RTT_ROOT=`/home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk`
   - "[ x$RTT_CC == x ] && export RTT_CC='gcc' || true" 
