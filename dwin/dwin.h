@@ -18,6 +18,7 @@
 
 /* low layer */ 
 #include "dwin_trans.h" 
+#include "dwin_system.h" 
 
 /* component layer */ 
 

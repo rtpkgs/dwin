@@ -41,8 +41,8 @@
 #define DWIN_USING_PRINT rt_kprintf
 #endif
 
-#define DWIN_GET_BYTEH(short) (((short) & 0xFF00) >> 8)
-#define DWIN_GET_BYTEL(short) (((short) & 0x00FF) >> 0)
+#define DWIN_GET_BYTEH(short) (rt_uint8_t)(((short) & 0xFF00) >> 8)
+#define DWIN_GET_BYTEL(short) (rt_uint8_t)(((short) & 0x00FF) >> 0)
 
 /* Debug */ 
 #ifndef DWIN_USING_DEBUG

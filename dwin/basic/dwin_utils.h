@@ -16,4 +16,8 @@
 
 #include "dwin_def.h" 
 
+rt_uint32_t dwin_utils_convert(const char *str); 
+rt_uint8_t dwin_utils_bcd2dec(rt_uint8_t bcd); 
+rt_uint8_t dwin_utils_dec2bcd(rt_uint8_t dec); 
+
 #endif 
