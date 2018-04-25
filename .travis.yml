@@ -13,16 +13,20 @@ before_script:
   - "[ $RTT_TOOL_CHAIN = 'sourcery-arm' ] && curl -s https://launchpadlibrarian.net/287101520/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2 | sudo tar xjf - -C /opt && export RTT_EXEC_PATH=/opt/gcc-arm-none-eabi-5_4-2016q3/bin && /opt/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-gcc --version || true" 
 
   # 准备RTT BSP用于编译 pwd 当前目录: /home/travis/build/liu2guang/dwin
-  - git clone --depth=3 --branch=master https://github.com/RT-Thread/rt-thread.git liu2guang/RT-Thread 
+  - git clone --depth=3 --branch=master https://github.com/RT-Thread/rt-thread.git ../RT-Thread 
   - ls /home/travis/build/liu2guang
   - ls /home/travis/build/liu2guang/dwin
   - ls /home/travis/build/liu2guang/RT-Thread
+  - cp /home/travis/build/liu2guang/dwin /home/travis/build/liu2guang/RT-Thread/bsp/packages/dwin
+  - ls /home/travis/build/liu2guang
+  - ls /home/travis/build/liu2guang/dwin
+  - ls /home/travis/build/liu2guang/RT-Thread/bsp/packages
 
 install: 
   - true
 
 script:
-  - scons -C ./
+  - scons -C /home/travis/build/liu2guang/RT-Thread/bsp/imxrt1052-evk/
 
 env:
-  - RTT_TOOL_CHAIN='sourcery-arm' 
+  - RTT_BSP='imxrt1052-evk' RTT_TOOL_CHAIN='sourcery-arm'
