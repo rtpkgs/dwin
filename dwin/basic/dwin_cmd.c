@@ -40,21 +40,48 @@ static void dwin(uint8_t argc, char **argv)
         {
             if((!strcmp(argv[2], "r")) && (!strcmp(argv[3], "reg")))
             {
-                DWIN_INFO("User read \033[32m%d\033[0m byte(s) from \033[32m0x%.4x\033[0m reg: \n", atoi(argv[5]), atoi(argv[4])); 
+                int addr = 0; 
+                if(strchr((const char *)argv[4], 'x') == RT_NULL && strchr((const char *)argv[4], 'X') == RT_NULL)
+                {
+                    addr = atoi(argv[4]); 
+                }
+                else
+                {
+                    sscanf((const char *)argv[4], "%x", &addr); 
+                }
+                DWIN_INFO("User read \033[32m%d\033[0m byte(s) from \033[32m0x%.4x\033[0m reg: \n", atoi(argv[5]), addr); 
                 
                 rt_uint8_t data[256] = {0}; 
-                dwin_reg_read(atoi(argv[4]), data, atoi(argv[5])); 
+                dwin_reg_read(addr, data, atoi(argv[5])); 
             }
             else if((!strcmp(argv[2], "r")) && (!strcmp(argv[3], "var")))
             {
-                DWIN_INFO("User read \033[32m%d\033[0m byte(s) from \033[32m0x%.4x\033[0m var: \n", atoi(argv[5]), atoi(argv[4])); 
+                int addr = 0; 
+                if(strchr((const char *)argv[4], 'x') == RT_NULL && strchr((const char *)argv[4], 'X') == RT_NULL)
+                {
+                    addr = atoi(argv[4]); 
+                }
+                else
+                {
+                    sscanf((const char *)argv[4], "%x", &addr); 
+                }
+                DWIN_INFO("User read \033[32m%d\033[0m byte(s) from \033[32m0x%.4x\033[0m var: \n", atoi(argv[5]), addr); 
                 
                 rt_uint16_t data[128] = {0}; 
-                dwin_var_read(atoi(argv[4]), data, atoi(argv[5])); 
+                dwin_var_read(addr, data, atoi(argv[5])); 
             }
             else if((!strcmp(argv[2], "w")) && (!strcmp(argv[3], "reg")))
             {
-                DWIN_INFO("User write \033[32m%d\033[0m byte(s) from \033[32m0x%.4x\033[0m reg: \n", atoi(argv[5]), atoi(argv[4])); 
+                int addr = 0; 
+                if(strchr((const char *)argv[4], 'x') == RT_NULL && strchr((const char *)argv[4], 'X') == RT_NULL)
+                {
+                    addr = atoi(argv[4]); 
+                }
+                else
+                {
+                    sscanf((const char *)argv[4], "%x", &addr); 
+                }
+                DWIN_INFO("User write \033[32m%d\033[0m byte(s) from \033[32m0x%.4x\033[0m reg: \n", atoi(argv[5]), addr); 
                 
                 rt_uint8_t index = 0; 
                 rt_uint8_t data[256] = {0}; 
@@ -64,11 +91,20 @@ static void dwin(uint8_t argc, char **argv)
                     data[index] = atoi(argv[6+index]);
                 }
                 
-                dwin_reg_write(atoi(argv[4]), data, atoi(argv[5])); 
+                dwin_reg_write(addr, data, atoi(argv[5])); 
             }
             else if((!strcmp(argv[2], "w")) && (!strcmp(argv[3], "var")))
             {
-                DWIN_INFO("User write \033[32m%d\033[0m byte(s) from \033[32m0x%.4x\033[0m var: \n", atoi(argv[5]), atoi(argv[4])); 
+                int addr = 0; 
+                if(strchr((const char *)argv[4], 'x') == RT_NULL && strchr((const char *)argv[4], 'X') == RT_NULL)
+                {
+                    addr = atoi(argv[4]); 
+                }
+                else
+                {
+                    sscanf((const char *)argv[4], "%x", &addr); 
+                }
+                DWIN_INFO("User write \033[32m%d\033[0m byte(s) from \033[32m0x%.4x\033[0m var: \n", atoi(argv[5]), addr); 
                 
                 rt_uint8_t index = 0; 
                 rt_uint16_t data[128] = {0}; 
@@ -78,7 +114,7 @@ static void dwin(uint8_t argc, char **argv)
                     data[index] = atoi(argv[6+index]);
                 }
                 
-                dwin_var_write(atoi(argv[4]), data, atoi(argv[5])); 
+                dwin_var_write(addr, data, atoi(argv[5])); 
             }
             else
             {
