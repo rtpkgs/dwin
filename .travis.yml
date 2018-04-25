@@ -3,6 +3,9 @@ language: c
 notifications:
   email: false
 
+git:
+  depth: 3
+
 before_script:
   # travis has changed to 64-bit and we require 32-bit compatibility libraries 
   - sudo apt-get update 
@@ -12,6 +15,9 @@ before_script:
 
   # - sudo apt-get -qq install gcc-arm-none-eabi
   - "[ $TOOL_CHAIN = 'sourcery-arm' ] && curl -s https://launchpadlibrarian.net/287101520/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2 | sudo tar xjf - -C /opt && export RTT_EXEC_PATH=/opt/gcc-arm-none-eabi-5_4-2016q3/bin && /opt/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-gcc --version || true" 
+
+install: 
+  - true
 
 script:
   - scons -C ./
