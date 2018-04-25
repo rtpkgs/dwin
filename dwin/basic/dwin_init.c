@@ -44,14 +44,6 @@ int dwin_init(void)
     DWIN_INFO("Welcome to the dwin library.\n"); 
     DWIN_INFO("You can find the v2.0.0 from https://github.com/liu2guang/dwin.\n"); 
     
-    rt_uint16_t data[20] = {0}; 
-    dwin_system_get_cpuid(data); 
-    
-    dwin_system_reset(); 
-    dwin_system_get_version(data); 
-    dwin_system_get_rtc(data); 
-    dwin_system_get_page(data); 
-    
     return RT_EOK; 
 }
 INIT_APP_EXPORT(dwin_init); 
