@@ -13,7 +13,8 @@ before_script:
   - "[ $RTT_TOOL_CHAIN = 'sourcery-arm' ] && curl -s https://launchpadlibrarian.net/287101520/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2 | sudo tar xjf - -C /opt && export RTT_EXEC_PATH=/opt/gcc-arm-none-eabi-5_4-2016q3/bin && /opt/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-gcc --version || true" 
 
   # 准备RTT BSP用于编译
-  # - git clone --depth=3 --branch=master https://github.com/RT-Thread/rt-thread.git liu2guang/RT-Thread
+  - pwd
+  - git clone --depth=3 --branch=master https://github.com/RT-Thread/rt-thread.git liu2guang/RT-Thread
   - pwd
 
 install: 
