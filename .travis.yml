@@ -9,12 +9,12 @@ git:
 before_script:
   # travis has changed to 64-bit and we require 32-bit compatibility libraries 
   - sudo apt-get update 
-
-  # clang
   - "sudo apt-get -qq install gcc-multilib libc6:i386 libgcc1:i386 gcc-4.6-base:i386 libstdc++5:i386 libstdc++6:i386 libsdl-dev || true" 
+  - "[ $RTT_TOOL_CHAIN = 'sourcery-arm' ] && curl -s https://launchpadlibrarian.net/287101520/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2 | sudo tar xjf - -C /opt && export RTT_EXEC_PATH=/opt/gcc-arm-none-eabi-5_4-2016q3/bin && /opt/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-gcc --version || true" 
 
-  # - sudo apt-get -qq install gcc-arm-none-eabi
-  - "[ $TOOL_CHAIN = 'sourcery-arm' ] && curl -s https://launchpadlibrarian.net/287101520/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2 | sudo tar xjf - -C /opt && export RTT_EXEC_PATH=/opt/gcc-arm-none-eabi-5_4-2016q3/bin && /opt/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi-gcc --version || true" 
+  # 准备RTT BSP用于编译
+  # - git clone --depth=3 --branch=master https://github.com/RT-Thread/rt-thread.git liu2guang/RT-Thread
+  - pwd
 
 install: 
   - true
@@ -23,4 +23,4 @@ script:
   - scons -C ./
 
 env:
-  - TOOL_CHAIN='sourcery-arm' 
+  - RTT_TOOL_CHAIN='sourcery-arm' 
