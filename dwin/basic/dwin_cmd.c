@@ -125,24 +125,83 @@ static void dwin(uint8_t argc, char **argv)
             }
             else if(!strcmp(argv[2], "rtc"))
             {
-                rt_uint16_t data[4] = {0}; 
-                
-                dwin_system_get_rtc(data); 
-                #ifndef DWIN_USING_DEBUG
-                DWIN_INFO("Get dwin rtc: \033[32m20%.2d-%.2d-%.2d %.2d:%.2d:%.2d week %d\033[0m.\n", 
-                    DWIN_GET_BYTEH(rtc[0]), DWIN_GET_BYTEL(rtc[0]), DWIN_GET_BYTEH(rtc[1]), 
-                    DWIN_GET_BYTEH(rtc[2]), DWIN_GET_BYTEL(rtc[2]), DWIN_GET_BYTEH(rtc[3]),
-                    DWIN_GET_BYTEL(rtc[1])); 
-                #endif
+                if(argc == 3)
+                {
+                    rt_uint8_t data[6] = {0}; 
+                    
+                    dwin_system_get_rtc(&data[0], &data[1], &data[2], &data[3], &data[4], &data[5]); 
+                    #ifndef DWIN_USING_DEBUG
+                    DWIN_INFO("Get dwin rtc: \033[32m20%.2d-%.2d-%.2d %.2d:%.2d:%.2d\033[0m.\n", 
+                        data[0], data[1], data[2], data[3], data[4], data[5]); 
+                    #endif
+                }
+                else if(argc <= 9)
+                {
+                    rt_uint8_t data[6] = {0}; 
+                    
+                    if(atoi(argv[3]) > 99)
+                    {
+                        DWIN_USING_PRINT("\033[31mdwin: error: year maximum 99.\033[0m\n"); 
+                        return; 
+                    }
+                    if(atoi(argv[4]) > 12)
+                    {
+                        DWIN_USING_PRINT("\033[31mdwin: error: mon maximum 12.\033[0m\n"); 
+                        return; 
+                    }
+                    if(atoi(argv[5]) > 31)
+                    {
+                        DWIN_USING_PRINT("\033[31mdwin: error: day maximum 31.\033[0m\n"); 
+                        return; 
+                    }
+                    if(atoi(argv[6]) > 23)
+                    {
+                        DWIN_USING_PRINT("\033[31mdwin: error: hour maximum 23.\033[0m\n"); 
+                        return; 
+                    }
+                    if(atoi(argv[7]) > 59)
+                    {
+                        DWIN_USING_PRINT("\033[31mdwin: error: min maximum 59.\033[0m\n"); 
+                        return; 
+                    }
+                    if(atoi(argv[8]) > 59)
+                    {
+                        DWIN_USING_PRINT("\033[31mdwin: error: sec maximum 59.\033[0m\n"); 
+                        return; 
+                    }
+                    
+                    dwin_system_get_rtc(&data[0], &data[1], &data[2], &data[3], &data[4], &data[5]); 
+                    
+                    if(argc >= 4) data[0] = atoi(argv[3]); 
+                    if(argc >= 5) data[1] = atoi(argv[4]); 
+                    if(argc >= 6) data[2] = atoi(argv[5]); 
+                    if(argc >= 7) data[3] = atoi(argv[6]); 
+                    if(argc >= 8) data[4] = atoi(argv[7]); 
+                    if(argc >= 9) data[5] = atoi(argv[8]); 
+
+                    dwin_system_set_rtc(data[0], data[1], data[2], data[3], data[4], data[5]); 
+                }
             }
             else if(!strcmp(argv[2], "page"))
             {
-                rt_uint16_t data = 0; 
-                
-                dwin_system_get_page(&data); 
-                #ifndef DWIN_USING_DEBUG
-                DWIN_INFO("Get dwin page: \033[32m%.4d\033[0m.\n", data); 
-                #endif
+                if(argc == 3)
+                {
+                    rt_uint16_t data = 0; 
+                    
+                    dwin_system_get_page(&data); 
+                    #ifndef DWIN_USING_DEBUG
+                    DWIN_INFO("Get dwin page: \033[32m%.4d\033[0m.\n", data); 
+                    #endif
+                }
+                else
+                {
+                    rt_uint16_t page = atoi(argv[3]); 
+                    
+                    dwin_system_set_page(page); 
+                    #ifndef DWIN_USING_DEBUG
+                    DWIN_INFO("Jump dwin \033[32m%.4d\033[0m page.\n", page); 
+                    #endif
+                }
             }
             else
             {
@@ -151,8 +210,8 @@ static void dwin(uint8_t argc, char **argv)
                 DWIN_USING_PRINT("  cpu    get dwin cpu id.\n"); 
                 DWIN_USING_PRINT("  rst    reset dwin display.\n"); 
                 DWIN_USING_PRINT("  ver    get dwin gui and dwin-os version.\n"); 
-                DWIN_USING_PRINT("  rtc    get dwin rtc time info.\n"); 
-                DWIN_USING_PRINT("  page   get dwin current page id.\n"); 
+                DWIN_USING_PRINT("  rtc    set/get dwin rtc time info.\n"); 
+                DWIN_USING_PRINT("  page   jump/get dwin current page id.\n"); 
                 return; 
             }
         }

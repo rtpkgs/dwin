@@ -43,6 +43,7 @@
 
 #define DWIN_GET_BYTEH(short) (rt_uint8_t)(((short) & 0xFF00) >> 8)
 #define DWIN_GET_BYTEL(short) (rt_uint8_t)(((short) & 0x00FF) >> 0)
+#define DWIN_SET_SHORT(b1, b2) (rt_uint16_t)((b1 << 8) | (b2 & 0xff))
 
 /* Debug */ 
 #ifndef DWIN_USING_DEBUG

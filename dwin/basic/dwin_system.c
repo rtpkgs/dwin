@@ -17,7 +17,6 @@
 
 /* system addr(var) */ 
 #if (DWIN_USING_MODEL == 2) 
-    
 #define DWIN_SYSTEM_DEVICE_ID         (0x0000)
 #define DWIN_SYSTEM_SYS_RESET         (0x0004)
 #define DWIN_SYSTEM_OS_UPDATE_CMD     (0x0006)
@@ -39,7 +38,6 @@
 #define DWIN_SYSTEM_NAND_FLASH_RW_CMD (0x00AA)
 #define DWIN_SYSTEM_DCS_BUS_DATA      (0x0100)
 #define DWIN_SYSTEM_DYNAMIC_CURVE     (0x0300)
-    
 #endif
 
 /* 注意数据的大小端 */ 
@@ -102,11 +100,17 @@ rt_err_t dwin_system_get_version(rt_uint16_t *ver)
     return RT_EOK; 
 }
 
-rt_err_t dwin_system_get_rtc(rt_uint16_t *rtc)
+rt_err_t dwin_system_get_rtc(rt_uint8_t *year, rt_uint8_t *mon, rt_uint8_t *day, rt_uint8_t *hour, rt_uint8_t *min, rt_uint8_t *sec)
 {
     rt_err_t ret = RT_EOK; 
+    rt_uint16_t rtc[4] = {0}; 
     
-    RT_ASSERT(rtc != RT_NULL); 
+    RT_ASSERT(year != RT_NULL); 
+    RT_ASSERT(mon  != RT_NULL); 
+    RT_ASSERT(day  != RT_NULL); 
+    RT_ASSERT(hour != RT_NULL); 
+    RT_ASSERT(min  != RT_NULL); 
+    RT_ASSERT(sec  != RT_NULL); 
     
     ret = dwin_var_read(DWIN_SYSTEM_RTC, rtc, 4); 
     if(ret != RT_EOK)
@@ -114,10 +118,45 @@ rt_err_t dwin_system_get_rtc(rt_uint16_t *rtc)
         DWIN_DBG("Get dwin rtc failed error code: \033[31m%d\033[0m].\n", ret); 
         return ret; 
     }
+    
+    *year = DWIN_GET_BYTEH(rtc[0]); 
+    *mon  = DWIN_GET_BYTEL(rtc[0]); 
+    *day  = DWIN_GET_BYTEH(rtc[1]); 
+    *hour = DWIN_GET_BYTEH(rtc[2]); 
+    *min  = DWIN_GET_BYTEL(rtc[2]); 
+    *sec  = DWIN_GET_BYTEH(rtc[3]); 
+    
     DWIN_DBG("Get dwin rtc: \033[32m20%.2d-%.2d-%.2d %.2d:%.2d:%.2d week %d\033[0m.\n", 
-        DWIN_GET_BYTEH(rtc[0]), DWIN_GET_BYTEL(rtc[0]), DWIN_GET_BYTEH(rtc[1]), 
-        DWIN_GET_BYTEH(rtc[2]), DWIN_GET_BYTEL(rtc[2]), DWIN_GET_BYTEH(rtc[3]),
-        DWIN_GET_BYTEL(rtc[1])); 
+        *year, *mon, *day, *hour, *min, *sec, DWIN_GET_BYTEL(rtc[1])); 
+    
+    return RT_EOK; 
+}
+
+rt_err_t dwin_system_set_rtc(rt_uint8_t year, rt_uint8_t mon, rt_uint8_t day, rt_uint8_t hour, rt_uint8_t min, rt_uint8_t sec)
+{
+    rt_err_t ret = RT_EOK; 
+    rt_uint16_t data[4] = {0}; 
+    
+    RT_ASSERT(year <= 99); 
+    RT_ASSERT(mon  <= 12); 
+    RT_ASSERT(day  <= 31); 
+    RT_ASSERT(hour <= 23); 
+    RT_ASSERT(min  <= 59); 
+    RT_ASSERT(sec  <= 59);  
+    
+    data[0] = 0x5aa5; 
+    data[1] = DWIN_SET_SHORT(year, mon); 
+    data[2] = DWIN_SET_SHORT(day, hour); 
+    data[3] = DWIN_SET_SHORT(min, sec); 
+    
+    ret = dwin_var_write(DWIN_SYSTEM_RTC_SET, data, 4); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Set dwin rtc failed error code: \033[31m%d\033[0m].\n", ret); 
+        return ret; 
+    }
+    DWIN_DBG("Set dwin rtc: \033[32m20%.2d-%.2d-%.2d %.2d:%.2d:%.2d\033[0m.\n", 
+        year, mon, day, hour, min, sec); 
     
     return RT_EOK; 
 }
@@ -131,10 +170,28 @@ rt_err_t dwin_system_get_page(rt_uint16_t *page)
     ret = dwin_var_read(DWIN_SYSTEM_PIC_NOW, page, 1); 
     if(ret != RT_EOK)
     {
-        DWIN_DBG("Get dwin page failed error code: \033[31m%d\033[0m].\n", ret); 
+        DWIN_DBG("Get dwin current page failed error code: \033[31m%d\033[0m].\n", ret); 
         return ret; 
     }
-    DWIN_DBG("Get dwin page: \033[32m%.4d\033[0m.\n", *page); 
+    DWIN_DBG("Get dwin current page: \033[32m%.4d\033[0m.\n", *page); 
+    
+    return RT_EOK; 
+}
+
+rt_err_t dwin_system_set_page(rt_uint16_t page)
+{
+    rt_err_t ret = RT_EOK; 
+    rt_uint16_t data[2] = {0}; 
+    
+    data[0] = 0x5A01; 
+    data[1] = page; 
+    ret = dwin_var_write(DWIN_SYSTEM_PIC_SET, data, 2); 
+    if(ret != RT_EOK)
+    {
+        DWIN_DBG("Jump dwin \033[32m%.4d\033[0m page failed error code: \033[31m%d\033[0m].\n", page, ret); 
+        return ret; 
+    }
+    DWIN_DBG("Jump dwin \033[32m%.4d\033[0m page.\n", page); 
     
     return RT_EOK; 
 }
