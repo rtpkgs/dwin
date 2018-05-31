@@ -13,7 +13,7 @@
 
 #include "dwin_init.h" 
 
-static struct dwin dwin; 
+static struct dwin dwin = {0}; 
 
 int dwin_init(void)
 {
@@ -21,29 +21,25 @@ int dwin_init(void)
     
     if(dwin.init == RT_TRUE)
     {
-        DWIN_DBG("The dwin initialized.\n"); 
+        DWIN_DBG("The dwin lib initialized.\n"); 
         return RT_EBUSY;
     }
     
     rt_memset(&dwin, 0x00, sizeof(struct dwin)); 
     
+    DWIN_PRINT("\n");
+    DWIN_INFO("Welcome to the dwin \033[32mv2.0.0\033[0m lib.\n"); 
+    DWIN_INFO("You can find the laster from <\033[31mhttps://github.com/liu2guang/dwin\033[0m>.\n\n"); 
+    
     extern rt_err_t dwin_watch_init(dwin_t dwin, const char *name, rt_uint32_t baudrate); 
     ret = dwin_watch_init(&dwin, DWIN_USING_UART, DWIN_USING_BAUDRATE); 
     if(ret != RT_EOK)
     {
-        DWIN_DBG("Watch init failed error code: %d.\n", ret); 
         return ret; 
     } 
-    else
-    {
-        DWIN_DBG("Watch init succeed.\n"); 
-    }
     
     dwin.init = RT_TRUE; 
-    
-    DWIN_INFO("Welcome to the dwin library.\n"); 
-    DWIN_INFO("You can find the v2.0.0 from https://github.com/liu2guang/dwin.\n"); 
-    
+
     return RT_EOK; 
 }
 INIT_APP_EXPORT(dwin_init); 

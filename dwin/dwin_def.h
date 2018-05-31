@@ -18,14 +18,6 @@
 #include "rtdevice.h" 
 
 /* Default config */ 
-#ifndef DWIN_USING_MODEL
-#error "Please define 'DWIN_USING_MODEL' macro!" 
-#endif
-
-#ifndef DWIN_USING_UART
-#error "Please define 'DWIN_USING_UART' macro!" 
-#endif
-
 #ifndef DWIN_USING_BAUDRATE
 #define DWIN_USING_BAUDRATE 115200
 #endif
@@ -37,31 +29,50 @@
 #define DWIN_USING_HEADL 0xA5
 #endif
 
-#ifndef DWIN_USING_PRINT
-#define DWIN_USING_PRINT rt_kprintf
-#endif
-
 #define DWIN_GET_BYTEH(short) (rt_uint8_t)(((short) & 0xFF00) >> 8)
 #define DWIN_GET_BYTEL(short) (rt_uint8_t)(((short) & 0x00FF) >> 0)
 #define DWIN_SET_SHORT(b1, b2) (rt_uint16_t)((b1 << 8) | (b2 & 0xff))
 
-/* Debug */ 
+/* µ÷ÊÔÐÅÏ¢ */ 
+#define DWIN_PRINT(fmt, ...)              \
+do{                                       \
+    rt_kprintf(fmt, ##__VA_ARGS__);       \
+}while(0)
+
+#define DWIN_INFO(fmt, ...)               \
+do{                                       \
+    rt_kprintf("[\033[32mdwin\033[0m] "); \
+    rt_kprintf(fmt, ##__VA_ARGS__);       \
+}while(0)
+
 #ifndef DWIN_USING_DEBUG
 #define DWIN_DBG(fmt, ...) 
+#define DWIN_START(bool, fmt, ...) 
 #else
-#define DWIN_DBG(fmt, ...)                      \
-do{                                             \
-    DWIN_USING_PRINT("[\033[32mdwin\033[0m] "); \
-    DWIN_USING_PRINT(fmt, ##__VA_ARGS__);       \
+#define DWIN_DBG(fmt, ...)                \
+do{                                       \
+    rt_kprintf("[\033[32mdwin\033[0m] "); \
+    rt_kprintf(fmt, ##__VA_ARGS__);       \
+}while(0)
+#define DWIN_START(bool, fmt, ...)                 \
+do{                                                \
+    rt_kprintf("[\033[32mdwin\033[0m] ");          \
+    rt_kprintf(fmt, ##__VA_ARGS__);                \
+    if(bool == RT_FALSE)                           \
+        rt_kprintf("\t\t[\033[32mFail\033[0m]\n"); \
+    else                                           \
+        rt_kprintf("\t\t[\033[32mOK\033[0m]\n");   \
 }while(0)
 #endif
-    
-/* Info */ 
-#define DWIN_INFO(fmt, ...)                     \
-do{                                             \
-    DWIN_USING_PRINT("[\033[32mdwin\033[0m] "); \
-    DWIN_USING_PRINT(fmt, ##__VA_ARGS__);       \
-}while(0)
+
+enum dwin_dir
+{
+    DWIN_DIR_000 = 0, 
+    DWIN_DIR_090, 
+    DWIN_DIR_180,
+    DWIN_DIR_270
+}; 
+typedef enum dwin_dir dwin_dir_t; 
 
 enum dwin_watch_state
 {
@@ -85,9 +96,8 @@ typedef struct dwin_watch *dwin_watch_t;
     
 struct dwin
 {
-    dwin_watch_t watch; 
-    
     rt_bool_t init; 
+    dwin_watch_t watch; 
 }; 
 typedef struct dwin *dwin_t; 
 
