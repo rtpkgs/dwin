@@ -32,22 +32,54 @@ static rt_uint32_t str2int(const char *str)
     return num; 
 } 
 
-static void uasge(void)
+static void uasge(uint8_t argc, char **argv)
 {
-    DWIN_PRINT("\033[36mUsage: dwin [options] [arg...] \033[0m\n\n"); 
-    DWIN_PRINT("optional arg: \n"); 
-    DWIN_PRINT("  -t    read/write dwin var/reg.\n"); 
-    DWIN_PRINT("  -s    debug dwin system function.\n"); 
+    rt_uint8_t index = 0; 
+    
+    DWIN_PRINT("\033[31mERR command format:\033[0m", argv[1]); 
+    for(;index < argc; index++)
+    {
+        DWIN_PRINT(" %s", argv[index]); 
+    }
+    DWIN_PRINT("\n"); 
+    
+    DWIN_PRINT("\033[32mThe command format:\033[0m\n"); 
+    DWIN_PRINT("\033[36m  1. read reg or var        dwin -t r <reg|var> <addr> <len>\033[0m\n"); 
+    DWIN_PRINT("\033[36m  2. write reg or var       dwin -t w <reg|var> <addr> <len> <data...>\033[0m\n"); 
+    DWIN_PRINT("\033[36m  3. print version          dwin -s <ver|version>\033[0m\n"); 
+    DWIN_PRINT("\033[36m  4. set or read backlight  dwin -s <bl|backlight> [level]\033[0m\n");
 }
 
-static void uasge_t(void)
+static void uasge_t(uint8_t argc, char **argv)
 {
-    DWIN_PRINT("\033[31mERR, \033[0mformat: \033[36mdwin -t <r|w> <reg|var> <addr> <len> [data...]\033[0m.\n"); 
+    rt_uint8_t index = 0; 
+    
+    DWIN_PRINT("\033[31mERR command format:\033[0m", argv[1]); 
+    for(;index < argc; index++)
+    {
+        DWIN_PRINT(" %s", argv[index]); 
+    }
+    DWIN_PRINT("\n"); 
+    
+    DWIN_PRINT("\033[32mThe command format:\033[0m\n"); 
+    DWIN_PRINT("\033[36m  1. read reg or var        dwin -t r <reg|var> <addr> <len>\033[0m\n"); 
+    DWIN_PRINT("\033[36m  2. write reg or var       dwin -t w <reg|var> <addr> <len> <data...>\033[0m\n"); 
 }
 
-static void uasge_s(void)
+static void uasge_s(uint8_t argc, char **argv)
 {
-    DWIN_PRINT("\033[31mERR, \033[0mformat: \033[36mdwin -s \033[0m.\n"); 
+    rt_uint8_t index = 0; 
+    
+    DWIN_PRINT("\033[31mERR command format:\033[0m", argv[1]); 
+    for(;index < argc; index++) 
+    {
+        DWIN_PRINT(" %s", argv[index]); 
+    }
+    DWIN_PRINT("\n"); 
+    
+    DWIN_PRINT("\033[32mThe command format:\033[0m\n"); 
+    DWIN_PRINT("\033[36m  1. print version          dwin -s <ver|version>\033[0m\n"); 
+    DWIN_PRINT("\033[36m  2. set or read backlight  dwin -s <bl|backlight> [level]\033[0m\n");
 }
 
 /* 只有开启调试模式, 才有该命令 */ 
@@ -55,7 +87,7 @@ static int dwin_cmd(uint8_t argc, char **argv)
 {
     if(argc < 2)
     {
-        uasge(); 
+        uasge(argc, argv); 
         return RT_EOK; 
     }
     else
@@ -126,29 +158,40 @@ static int dwin_cmd(uint8_t argc, char **argv)
             
             else
             {
-                uasge_t(); 
+                uasge_t(argc, argv); 
                 return RT_ERROR; 
             }
         }
         
         else if(!strcmp(argv[1], "-s") || !strcmp(argv[1], "--system")) 
         {
-//            if()
-//            {
-//            
-//            }
-//            
-//            else
-//            {
-//                uasge_s(); 
-//                return RT_ERROR; 
-//            }
+            if(!strcmp(argv[2], "ver") || !strcmp(argv[2], "version"))
+            {
+                rt_uint32_t data = 0; 
+                dwin_system_version(&data); 
+            }
+            
+            else if((!strcmp(argv[2], "bl") || !strcmp(argv[2], "backlight")) && (argc == 3))
+            {
+                rt_uint8_t data = 0;
+                dwin_system_get_backlight(&data); 
+            }
+            
+            else if((!strcmp(argv[2], "bl") || !strcmp(argv[2], "backlight")) && (argc >= 4))
+            {
+                dwin_system_set_backlight((rt_uint8_t )str2int(argv[3])); 
+            }
+            
+            else
+            {
+                uasge_s(argc, argv); 
+                return RT_ERROR; 
+            }
         }
         
         else
         {
-            DWIN_PRINT("\033[31mERR options:\033[0m %s\n", argv[1]); 
-            uasge(); 
+            uasge(argc, argv); 
             return RT_ERROR;
         }
     }

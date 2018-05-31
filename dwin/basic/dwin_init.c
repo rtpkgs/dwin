@@ -12,6 +12,7 @@
  */ 
 
 #include "dwin_init.h" 
+#include "dwin_system.h"
 
 static struct dwin dwin = {0}; 
 
@@ -39,7 +40,15 @@ int dwin_init(void)
     } 
     
     dwin.init = RT_TRUE; 
-
+    
+    /* 调试自动打印信息 */ 
+#if defined(DWIN_USING_DEBUG)
+    rt_uint32_t data = 0; 
+    
+    DWIN_PRINT("\n"); 
+    dwin_system_version(&data); 
+#endif 
+    
     return RT_EOK; 
 }
 INIT_APP_EXPORT(dwin_init); 

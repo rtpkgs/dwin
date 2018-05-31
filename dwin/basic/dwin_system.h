@@ -16,4 +16,22 @@
 
 #include "dwin_def.h" 
 
+/* 通用API */ 
+rt_err_t dwin_system_version(rt_uint32_t *ver_sn); 
+rt_err_t dwin_system_get_backlight(rt_uint8_t *level); 
+rt_err_t dwin_system_set_backlight(rt_uint8_t level); 
+
+/* 特有API */ 
+#if (DWIN_USING_TYPE == 0) 
+
+#endif 
+
+#if (DWIN_USING_TYPE == 1) 
+
+#endif 
+
+#if (DWIN_USING_TYPE == 2) 
+
+#endif 
+
 #endif 
