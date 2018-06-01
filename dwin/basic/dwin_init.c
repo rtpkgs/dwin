@@ -39,6 +39,31 @@ int dwin_init(void)
         return ret; 
     } 
     
+    dwin_system_touch(RT_TRUE); 
+    
+    /* 检测屏幕运行配置 */ 
+    rt_bool_t enable = RT_FALSE; 
+    ret = dwin_system_var_from_l22_upload(&enable); 
+    if(ret != RT_EOK || enable != RT_TRUE)
+    {
+        DWIN_INFO("The dwin lib need var L22 upload mode. dwin kill rtt system!\n"); 
+        while(1); 
+    }
+    
+    ret = dwin_system_backlight_by_touch_ctr(&enable); 
+    if(ret != RT_EOK || enable != RT_TRUE)
+    {
+        DWIN_INFO("The dwin lib need enable backlight by touch. dwin kill rtt system!\n"); 
+        while(1); 
+    }
+    
+    ret = dwin_system_crc(&enable); 
+    if(ret != RT_EOK || enable != RT_TRUE)
+    {
+        DWIN_INFO("The dwin lib need disable crc. dwin kill rtt system!\n"); 
+        while(1); 
+    }
+    
     dwin.init = RT_TRUE; 
     
     /* 调试自动打印信息 */ 

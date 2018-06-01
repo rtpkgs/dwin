@@ -83,6 +83,20 @@ enum dwin_watch_state
 }; 
 typedef enum dwin_watch_state dwin_watch_state_t; 
 
+struct dwin_rtc
+{
+    rt_uint16_t year; 
+    rt_uint8_t  month; 
+    rt_uint8_t  day; 
+    
+    rt_uint8_t  hour; 
+    rt_uint8_t  minute; 
+    rt_uint8_t  second; 
+    
+    rt_uint8_t  week;
+}; 
+typedef struct dwin_rtc *dwin_rtc_t; 
+
 struct dwin_watch
 {
     rt_device_t serial; 
