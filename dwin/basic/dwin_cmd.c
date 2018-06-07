@@ -196,7 +196,8 @@ static int dwin_cmd(uint8_t argc, char **argv)
             
             else if(!strcmp(argv[2], "jump") && (argc >= 4))
             {
-                dwin_system_jump((rt_uint16_t)str2int(argv[3])); 
+                extern rt_err_t dwin_page_jump_id(rt_uint16_t id); 
+                dwin_page_jump_id((rt_uint16_t)str2int(argv[3])); 
             }
             
             else if(!strcmp(argv[2], "page") && (argc == 3))

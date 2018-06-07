@@ -1,4 +1,4 @@
-/*
+/*/
  * @File:   dwin_def.h 
  * @Author: liu2guang 
  * @Date:   2018-04-22 14:52:10 
@@ -29,9 +29,11 @@
 #define DWIN_USING_HEADL 0xA5
 #endif
 
-#define DWIN_GET_BYTEH(short) (rt_uint8_t)(((short) & 0xFF00) >> 8)
-#define DWIN_GET_BYTEL(short) (rt_uint8_t)(((short) & 0x00FF) >> 0)
-#define DWIN_SET_SHORT(b1, b2) (rt_uint16_t)((b1 << 8) | (b2 & 0xff))
+#define DWIN_USING_NUM_MAX_PER_PAGE 64 /* 64 or 128 */ 
+
+#define DWIN_GET_BYTEH(short)  (rt_uint8_t)(((short) & 0xFF00) >> 8)
+#define DWIN_GET_BYTEL(short)  (rt_uint8_t)(((short) & 0x00FF) >> 0)
+#define DWIN_SET_SHORT(b1, b2) (rt_uint16_t)(((b1)<<8) | ((b2)&0xff))
 
 /* 调试信息 */ 
 #define DWIN_PRINT(fmt, ...)              \
@@ -74,14 +76,18 @@ enum dwin_dir
 }; 
 typedef enum dwin_dir dwin_dir_t; 
 
-enum dwin_watch_state
+enum dwin_obj_type
 {
-    DWIN_WATCH_STATE_IDLE = 0, 
-    DWIN_WATCH_STATE_HEADH, 
-    DWIN_WATCH_STATE_HEADL, 
-    DWIN_WATCH_STATE_DATE
+    DWIN_WIDGET_TYPE_BUTTON = 0, 
+    DWIN_WIDGET_TYPE_NUMBER, 
+    DWIN_WIDGET_TYPE_TEXT, 
+    DWIN_WIDGET_TYPE_INPUT, 
+    DWIN_WIDGET_TYPE_SCALE, 
+    DWIN_WIDGET_TYPE_ICON, 
+    DWIN_WIDGET_TYPE_QRCODE, 
+    DWIN_WIDGET_TYPE_MAX
 }; 
-typedef enum dwin_watch_state dwin_watch_state_t; 
+typedef enum dwin_obj_type dwin_obj_type_t; 
 
 struct dwin_rtc
 {
@@ -107,12 +113,46 @@ struct dwin_watch
     uint8_t data[256]; 
 }; 
 typedef struct dwin_watch *dwin_watch_t; 
+
+struct dwin_obj
+{
+    rt_list_t list; 
+    
+    enum dwin_obj_type type; 
+    
+    rt_uint16_t value_addr; 
+    rt_uint16_t value_size; 
+    
+    rt_uint8_t  active; 
+    
+    void (*cb)(void *p); 
+}; 
+typedef struct dwin_obj* dwin_obj_t; 
+
+struct dwin_page
+{
+    rt_list_t list; 
+    
+    rt_list_t  objs; 
+    rt_uint8_t obj_num; 
+    
+    rt_uint16_t id; 
+}; 
+typedef struct dwin_page* dwin_page_t; 
     
 struct dwin
 {
+    rt_list_t   pages;          /* 页面链表 */ 
+    
+    rt_uint16_t page_num;       /* 页面数量 */ 
+    
+    struct dwin_page* page_cur; /* 当前页面 */ 
+    
     rt_bool_t init; 
     dwin_watch_t watch; 
 }; 
 typedef struct dwin *dwin_t; 
+
+extern struct dwin dwin; 
 
 #endif

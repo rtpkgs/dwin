@@ -14,7 +14,7 @@
 #include "dwin_init.h" 
 #include "dwin_system.h"
 
-static struct dwin dwin = {0}; 
+struct dwin dwin = {0}; 
 
 int dwin_init(void)
 {
@@ -28,6 +28,10 @@ int dwin_init(void)
     
     rt_memset(&dwin, 0x00, sizeof(struct dwin)); 
     
+    rt_list_init(&(dwin.pages)); 
+    dwin.page_num      = 0; 
+    dwin.page_cur      = RT_NULL; 
+    
     DWIN_PRINT("\n");
     DWIN_INFO("Welcome to the dwin \033[32mv2.0.0\033[0m lib.\n"); 
     DWIN_INFO("You can find the laster from <\033[31mhttps://github.com/liu2guang/dwin\033[0m>.\n\n"); 
@@ -39,6 +43,7 @@ int dwin_init(void)
         return ret; 
     } 
     
+    DWIN_PRINT("\n"); 
     dwin_system_touch(RT_TRUE); 
     
     /* ºÏ≤‚∆¡ƒª‘À––≈‰÷√ */ 
@@ -70,8 +75,8 @@ int dwin_init(void)
 #if defined(DWIN_USING_DEBUG)
     rt_uint32_t data = 0; 
     
-    DWIN_PRINT("\n"); 
     dwin_system_version(&data); 
+    DWIN_PRINT("\n");
 #endif 
     
     return RT_EOK; 

@@ -1,5 +1,5 @@
 /*
- * @File:   dwin_init.c 
+ * @File:   dwin_init.h 
  * @Author: liu2guang 
  * @Date:   2018-04-22 14:52:10 
  * 

@@ -16,10 +16,14 @@
 
 #include "dwin_def.h" 
 
-/* low layer */ 
+/* basic */ 
 #include "dwin_trans.h" 
 #include "dwin_system.h" 
 
-/* component layer */ 
+/* obj and widgets */ 
+#include "dwin_obj.h" 
+#include "dwin_page.h" 
+
+#include "dwin_button.h" 
 
 #endif 
