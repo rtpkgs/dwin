@@ -9,7 +9,10 @@
  * Change Logs:
  * Date           Author       Notes
  * 2018-04-26     liu2guang    update v2 framework.
+<<<<<<< HEAD
  * 2018-06-05     balanceTWK   add DGUSII system func. 
+=======
+>>>>>>> 4ce79d961b847e663907b556237878b9b10e39f8
  */
 
 #include "dwin_system.h"
@@ -27,6 +30,7 @@ static rt_uint8_t dec2bcd(rt_uint8_t dec)
 
 /* 系统功能地址 ***************************************************************/
 #if (DWIN_USING_TYPE == 0)
+<<<<<<< HEAD
 #define DWIN_SYSTEM_REG_ADDR_VERSION        0x0000
 #define DWIN_SYSTEM_REG_ADDR_BACKLIGHT      0x0001
 #define DWIN_SYSTEM_REG_ADDR_BUZZ           0x0002
@@ -35,12 +39,23 @@ static rt_uint8_t dec2bcd(rt_uint8_t dec)
 #define DWIN_SYSTEM_REG_ADDR_RTC_WFLAG      0x001F
 #define DWIN_SYSTEM_REG_ADDR_RTC            0x0020
 #define DWIN_SYSTEM_REG_ADDR_KEY            0x004F
+=======
+#define DWIN_SYSTEM_REG_ADDR_VERSION    0x0000
+#define DWIN_SYSTEM_REG_ADDR_BACKLIGHT  0x0001
+#define DWIN_SYSTEM_REG_ADDR_BUZZ       0x0002
+#define DWIN_SYSTEM_REG_ADDR_PAGE       0x0003
+#define DWIN_SYSTEM_REG_ADDR_TOUCH_EN   0x000B
+#define DWIN_SYSTEM_REG_ADDR_RTC_WFLAG  0x001F
+#define DWIN_SYSTEM_REG_ADDR_RTC        0x0020
+#define DWIN_SYSTEM_REG_ADDR_KEY        0x004F
+>>>>>>> 4ce79d961b847e663907b556237878b9b10e39f8
 #endif
 
 #if (DWIN_USING_TYPE == 1)
 #endif
 
 #if (DWIN_USING_TYPE == 2)
+<<<<<<< HEAD
 #define DWIN_SYSTEM_VAR_ADDR_VERSION        0x000F
 #define DWIN_SYSTEM_VAR_ADDR_GETBACKLIGHT   0x0031
 #define DWIN_SYSTEM_VAR_ADDR_SETBACKLIGHT   0x0082
@@ -50,6 +65,17 @@ static rt_uint8_t dec2bcd(rt_uint8_t dec)
 //#define DWIN_SYSTEM_REG_ADDR_TOUCH_EN     0x000B
 #define DWIN_SYSTEM_VAR_ADDR_GETRTC         0x0010
 #define DWIN_SYSTEM_VAR_ADDR_SETRTC         0x009c
+=======
+#define DWIN_SYSTEM_VAR_ADDR_VERSION       0x000F
+#define DWIN_SYSTEM_VAR_ADDR_GETBACKLIGHT  0x0031
+#define DWIN_SYSTEM_VAR_ADDR_SETBACKLIGHT  0x0082
+#define DWIN_SYSTEM_VAR_ADDR_MUSIC         0x00A0
+#define DWIN_SYSTEM_VAR_ADDR_CURRENTPAGE   0x0014
+#define DWIN_SYSTEM_VAR_ADDR_JUMPPAGE      0x0084
+//#define DWIN_SYSTEM_REG_ADDR_TOUCH_EN    0x000B
+#define DWIN_SYSTEM_VAR_ADDR_GETRTC        0x0010
+#define DWIN_SYSTEM_VAR_ADDR_SETRTC        0x009c
+>>>>>>> 4ce79d961b847e663907b556237878b9b10e39f8
 #endif
 
 /* 通用系统功能API ************************************************************/
@@ -108,6 +134,12 @@ rt_err_t dwin_system_get_backlight(rt_uint8_t *level)
     RT_ASSERT(level != RT_NULL);
 
     if (dwin_reg_read(DWIN_SYSTEM_REG_ADDR_BACKLIGHT, level, 1) != RT_EOK)
+<<<<<<< HEAD
+    {
+        goto failed;
+    }
+
+=======
     {
         goto failed;
     }
@@ -128,10 +160,30 @@ rt_err_t dwin_system_get_backlight(rt_uint8_t *level)
         goto failed;
     }
     *level = (rt_uint8_t)(level_u16 & 0x00FF);
+>>>>>>> 4ce79d961b847e663907b556237878b9b10e39f8
     DWIN_DBG("The dwin backlight level is %d.\n", *level);
     return RT_EOK;
 #endif
 
+<<<<<<< HEAD
+#if (DWIN_USING_TYPE == 1)
+
+#endif
+
+#if (DWIN_USING_TYPE == 2)
+    RT_ASSERT(level != RT_NULL);
+    rt_uint16_t level_u16 = 0;
+    if (dwin_var_read(DWIN_SYSTEM_VAR_ADDR_GETBACKLIGHT, &level_u16, 1) != RT_EOK)
+    {
+        goto failed;
+    }
+    *level = (rt_uint8_t)(level_u16 & 0x00FF);
+    DWIN_DBG("The dwin backlight level is %d.\n", *level);
+    return RT_EOK;
+#endif
+
+=======
+>>>>>>> 4ce79d961b847e663907b556237878b9b10e39f8
 failed:
     DWIN_DBG("The dwin backlight level read \033[32mfailed\033[0m.\n");
     return RT_ERROR;
@@ -300,7 +352,11 @@ failed:
 rt_err_t dwin_system_touch(rt_bool_t enable)
 {
 #if (DWIN_USING_TYPE == 0)
+<<<<<<< HEAD
     rt_uint8_t data = (enable == RT_TRUE) ? 0xFF:0x00;
+=======
+    rt_uint8_t data = enable;
+>>>>>>> 4ce79d961b847e663907b556237878b9b10e39f8
 
     if (dwin_reg_write(DWIN_SYSTEM_REG_ADDR_TOUCH_EN, &data, 1) != RT_EOK)
     {
@@ -416,6 +472,10 @@ rt_err_t dwin_system_set_rtc(struct dwin_rtc rtc)
         return RT_ERROR;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4ce79d961b847e663907b556237878b9b10e39f8
     /* 真正的RTC地址为0x20, 但是修改了RTC需要在0x1F处
        写0x5a表明用户修改了RTC数据, 迪文屏幕在修改系
        RTC后会自动清零 */
