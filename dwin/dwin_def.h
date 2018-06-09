@@ -17,19 +17,33 @@
 #include "rtthread.h"
 #include "rtdevice.h" 
 
+/* dwin lib version information */
+#define DWIN_VERSION_M    2L /* main   version */
+#define DWIN_VERSION_S    0L /* sub    version */
+#define DWIN_VERSION_R    0L /* revise version */
+#define DWIN_VERSION      ((DWIN_VERSION_M * 10000) + (DWIN_VERSION_S * 100) + DWIN_VERSION_R)
+
 /* Default config */ 
 #ifndef DWIN_USING_BAUDRATE
 #define DWIN_USING_BAUDRATE 115200
 #endif
 
 #ifndef DWIN_USING_HEADH
-#define DWIN_USING_HEADH 0x5A
+#define DWIN_USING_HEADH    0x5A
 #endif
 #ifndef DWIN_USING_HEADL
-#define DWIN_USING_HEADL 0xA5
+#define DWIN_USING_HEADL    0xA5
 #endif
 
 #define DWIN_USING_NUM_MAX_PER_PAGE 64 /* 64 or 128 */ 
+
+#if   (DWIN_USING_TYPE == 0)
+#define DWIN_VAR_BASE_ADDR 0x0000
+#elif (DWIN_USING_TYPE == 1)
+#define DWIN_VAR_BASE_ADDR 0x0000
+#elif (DWIN_USING_TYPE == 2)
+#define DWIN_VAR_BASE_ADDR 0x1000
+#endif 
 
 #define DWIN_GET_BYTEH(short)  (rt_uint8_t)(((short) & 0xFF00) >> 8)
 #define DWIN_GET_BYTEL(short)  (rt_uint8_t)(((short) & 0x00FF) >> 0)
@@ -114,6 +128,7 @@ struct dwin_watch
 }; 
 typedef struct dwin_watch *dwin_watch_t; 
 
+/* Todo: 考虑回调函数移动到控件中去, 例如text没有解析回调函数 */ 
 struct dwin_obj
 {
     rt_list_t list; 
@@ -124,8 +139,6 @@ struct dwin_obj
     rt_uint16_t value_size; 
     
     rt_uint8_t  active; 
-    
-    void (*cb)(void *p); 
 }; 
 typedef struct dwin_obj* dwin_obj_t; 
 
@@ -139,17 +152,32 @@ struct dwin_page
     rt_uint16_t id; 
 }; 
 typedef struct dwin_page* dwin_page_t; 
+
+struct dwin_parse
+{
+    rt_list_t list;
+    
+    enum dwin_obj_type type; 
+    
+    void (*event)(struct dwin_obj *obj); 
+}; 
+typedef struct dwin_parse* dwin_parse_t; 
     
 struct dwin
 {
+    rt_bool_t init; 
+    
+    /* 页面相关 */ 
     rt_list_t   pages;          /* 页面链表 */ 
-    
     rt_uint16_t page_num;       /* 页面数量 */ 
-    
     struct dwin_page* page_cur; /* 当前页面 */ 
     
-    rt_bool_t init; 
+    /* 监听器相关 */ 
     dwin_watch_t watch; 
+    
+    /* 控件解析器链表 */ 
+    rt_list_t parses;           /* 解析器链表 */ 
+    rt_uint8_t parse_num;       /* 解析器数量 */
 }; 
 typedef struct dwin *dwin_t; 
 

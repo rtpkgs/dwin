@@ -13,12 +13,21 @@
 
 #include "dwin_button.h" 
 #include "dwin_obj.h" 
+#include "dwin_page.h" 
+#include "dwin_parse.h" 
 
 #define DWIN_BUTTON_VAR_SIZE (1) 
 
-struct dwin_button *dwin_button_create(struct dwin_page *page, rt_uint16_t addr, void (*cb)(void *p))
+static struct dwin_parse *parse = RT_NULL; 
+
+/* Button解析器事件处理函数 */ 
+static void dwin_button_event(struct dwin_obj *obj)
 {
-    struct dwin_obj *obj = RT_NULL; 
+    ((struct dwin_button *)obj)->push_cb(); 
+}
+
+struct dwin_button *dwin_button_create(struct dwin_page *page, rt_uint16_t addr, void (*push_cb)(void))
+{
     struct dwin_button *button = RT_NULL; 
     
     button = (struct dwin_button *)rt_malloc(sizeof(struct dwin_button)); 
@@ -28,25 +37,13 @@ struct dwin_button *dwin_button_create(struct dwin_page *page, rt_uint16_t addr,
         goto failed; 
     }
     
-    obj = dwin_obj_create(addr, DWIN_BUTTON_VAR_SIZE, DWIN_WIDGET_TYPE_BUTTON); 
-    if(obj == RT_NULL)
-    {
-        DWIN_DBG("Create button obj failed memory is not enough.\n"); 
-        goto failed; 
-    }
-    
-    button->obj = obj; 
-    dwin_obj_set_cb(button->obj, cb); 
-    dwin_page_add_obj(page, button->obj); 
+    dwin_obj_init(&(button->obj), addr, DWIN_BUTTON_VAR_SIZE, DWIN_WIDGET_TYPE_BUTTON); 
+    dwin_page_add_obj(page, &(button->obj)); 
+    button->push_cb = push_cb; 
     
     return button; 
     
 failed:
-    if(obj != RT_NULL)
-    {
-        dwin_obj_delect_safe(obj); 
-    }
-    
     if(button != RT_NULL)
     {
         rt_free(button); 
@@ -55,3 +52,12 @@ failed:
     return RT_NULL; 
 }
 
+/* 初始化Button控件解析器 */ 
+rt_err_t dwin_button_init(void)
+{
+    /* 注册控件解析器 */ 
+    parse = dwin_parse_create(DWIN_WIDGET_TYPE_BUTTON, dwin_button_event); 
+    dwin_parse_register(parse); 
+    
+    return RT_EOK; 
+}

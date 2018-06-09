@@ -12,8 +12,6 @@
  */ 
  
 #include "dwin_trans.h" 
-#include "dwin_obj.h" 
-#include "dwin_page.h" 
 
 /* 传输命令 */ 
 #define DWIN_REG_WRITE (0x80)
@@ -63,36 +61,6 @@ static uint8_t dwin_watch_getc(void)
 static rt_err_t dwin_watch_rxcb(rt_device_t dev, rt_size_t size)
 {
     return rt_sem_release(watch.rxsem);
-}
-
-
-void dwin_paser(uint8_t *data, uint8_t len)
-{
-    rt_list_t *list = RT_NULL;
-    struct dwin_obj *obj = RT_NULL; 
-    struct dwin_page *page = RT_NULL; 
-    
-    page = dwin_page_current(); 
-    
-    for(list = page->objs.next; list != &(page->objs); list = list->next)
-    {
-        if(rt_list_entry(list, struct dwin_obj, list)->value_addr == ((data[4]<<8)+(data[5])) && 
-           rt_list_entry(list, struct dwin_obj, list)->value_size == data[6])
-        {
-            obj = rt_list_entry(list, struct dwin_obj, list);
-            break;
-        }
-    }
-    
-    if(obj != RT_NULL)
-    {
-        switch(obj->type)
-        {
-            case DWIN_WIDGET_TYPE_BUTTON:
-                obj->cb(RT_NULL); 
-            break; 
-        }
-    }
 }
 
 static void dwin_watch_run(void *p)
@@ -161,9 +129,9 @@ static void dwin_watch_run(void *p)
                 }
                 DWIN_PRINT("\b}.\n");
 #endif
-                /* Data parse */ 
-                // DWIN_DBG("Start parse.\n"); 
-                dwin_paser(watch.data, watch.data[2]); 
+                /* 异步解析数据 */ 
+                extern void dwin_parse_exe(uint8_t *data, uint8_t len); 
+                dwin_parse_exe(watch.data, watch.data[2]); 
                 
                 index = 0;
                 state = DWIN_WATCH_STATE_IDLE;

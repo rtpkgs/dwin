@@ -18,10 +18,13 @@
 
 struct dwin_button
 {
-    struct dwin_obj *obj; 
+    struct dwin_obj obj; 
+    void (*push_cb)(void); 
 }; 
 typedef struct dwin_button* dwin_button_t; 
 
-struct dwin_button *dwin_button_create(struct dwin_page *page, rt_uint16_t addr, void (*cb)(void *p)); 
+struct dwin_button *dwin_button_create(struct dwin_page *page, rt_uint16_t addr, 
+    void (*push_cb)(void)); 
+rt_err_t dwin_button_init(void); 
 
 #endif 

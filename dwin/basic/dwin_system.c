@@ -69,6 +69,8 @@ rt_err_t dwin_system_version(rt_uint32_t *ver_sn)
     data = bcd2dec(data);
 
     *ver_sn = (DWIN_USING_TYPE * 10000) + (data) * 100 + 0;
+    
+    DWIN_DBG("The dwin lib is \033[32mv%d.%d.%d\033[0m.\n", DWIN_VERSION_M, DWIN_VERSION_S, DWIN_VERSION_R); 
     DWIN_DBG("The dwin type is DGUSMINI, DGUSVer is %d.%d, OSVer None, VER_SN is %d.\n", data / 10, data % 10, *ver_sn);
 
     return RT_EOK;
@@ -91,6 +93,8 @@ rt_err_t dwin_system_version(rt_uint32_t *ver_sn)
     buff[0] = (rt_uint8_t)(data >> 8);
     buff[1] = (rt_uint8_t)(data & 0x00FF);
     *ver_sn = (DWIN_USING_TYPE * 10000) + (buff[0]) * 100 + buff[1];
+    
+    DWIN_DBG("The dwin lib is \033[32mv%d.%d.%d\033[0m.\n", DWIN_VERSION_M, DWIN_VERSION_S, DWIN_VERSION_R); 
     DWIN_DBG("The dwin type is DGUSII, DGUSVer is %d, OSVer is %d, VER_SN is %d.\n", buff[0], buff[1], *ver_sn);
 
     return RT_EOK;

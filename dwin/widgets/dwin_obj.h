@@ -16,17 +16,7 @@
 
 #include "dwin_def.h" 
 
-struct dwin_obj *dwin_obj_create(rt_uint16_t addr, rt_uint8_t size, enum dwin_obj_type type); 
-rt_err_t dwin_obj_delect(struct dwin_obj *obj); 
-
-#define dwin_obj_delect_safe(obj)         \
-do{                                       \
-    dwin_obj_delect(obj); obj = RT_NULL;  \
-}while(0) 
-
-rt_err_t dwin_obj_set_cb(struct dwin_obj *obj, void (*cb)(void *p)); 
-#if defined(DWIN_USING_DEBUG)
-void dwin_obj_printf(struct dwin_obj *obj); 
-#endif 
+void dwin_obj_init(struct dwin_obj *obj, rt_uint16_t addr, rt_uint8_t size, enum dwin_obj_type type); 
+rt_err_t dwin_obj_active(struct dwin_obj *obj, rt_bool_t active); 
 
 #endif 

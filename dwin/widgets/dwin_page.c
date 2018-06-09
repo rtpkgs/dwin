@@ -76,6 +76,13 @@ rt_err_t dwin_page_add_obj(struct dwin_page *page, struct dwin_obj *obj)
     return RT_EOK; 
 }
 
+rt_err_t dwin_page_remove_obj(struct dwin_page *page, struct dwin_obj *obj)
+{
+    /* Todo: ÊµÏÖÒÆ³ıobj */ 
+    
+    return RT_EOK; 
+}
+
 struct dwin_page *dwin_page_current(void)
 {
     return dwin.page_cur; 
