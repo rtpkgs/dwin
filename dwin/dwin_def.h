@@ -45,6 +45,8 @@
 #define DWIN_VAR_BASE_ADDR 0x1000
 #endif 
 
+#define DWIN_VAR_ADDR(addr) (DWIN_VAR_BASE_ADDR+(addr))
+
 #define DWIN_GET_BYTEH(short)  (rt_uint8_t)(((short) & 0xFF00) >> 8)
 #define DWIN_GET_BYTEL(short)  (rt_uint8_t)(((short) & 0x00FF) >> 0)
 #define DWIN_SET_SHORT(b1, b2) (rt_uint16_t)(((b1)<<8) | ((b2)&0xff))
@@ -146,9 +148,7 @@ struct dwin_page
 {
     rt_list_t list; 
     
-    rt_list_t  objs; 
-    rt_uint8_t obj_num; 
-    
+    rt_list_t objs; 
     rt_uint16_t id; 
 }; 
 typedef struct dwin_page* dwin_page_t; 
@@ -159,7 +159,7 @@ struct dwin_parse
     
     enum dwin_obj_type type; 
     
-    void (*event)(struct dwin_obj *obj); 
+    void (*event)(struct dwin_obj *obj, uint8_t *data, uint8_t len); 
 }; 
 typedef struct dwin_parse* dwin_parse_t; 
     

@@ -29,7 +29,6 @@ struct dwin_page *dwin_page_create(rt_uint16_t id)
     rt_list_init(&(page->objs)); 
     
     page->id = id; 
-    page->obj_num = 0; 
     
     rt_list_insert_before(&(dwin.pages), &(page->list)); 
     
@@ -67,18 +66,19 @@ failed:
 
 rt_err_t dwin_page_add_obj(struct dwin_page *page, struct dwin_obj *obj)
 {
-    RT_ASSERT(obj  != RT_NULL); 
     RT_ASSERT(page != RT_NULL); 
+    RT_ASSERT(obj  != RT_NULL); 
     
     rt_list_insert_before(&(page->objs), &(obj->list)); 
-    page->obj_num++; 
     
     return RT_EOK; 
 }
 
-rt_err_t dwin_page_remove_obj(struct dwin_page *page, struct dwin_obj *obj)
+rt_err_t dwin_page_remove_obj(struct dwin_obj *obj)
 {
-    /* Todo: ÊµÏÖÒÆ³ıobj */ 
+    RT_ASSERT(obj  != RT_NULL); 
+    
+    rt_list_remove(&(obj->list)); 
     
     return RT_EOK; 
 }

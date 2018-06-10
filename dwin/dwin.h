@@ -25,5 +25,6 @@
 #include "dwin_page.h" 
 
 #include "dwin_button.h" 
+#include "dwin_scale.h" 
 
 #endif 

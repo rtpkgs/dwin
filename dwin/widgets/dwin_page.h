@@ -22,6 +22,7 @@ do{                                         \
     dwin_page_delect(page); page = RT_NULL; \
 }while(0) 
 rt_err_t dwin_page_add_obj(struct dwin_page *page, struct dwin_obj *obj); 
+rt_err_t dwin_page_remove_obj(struct dwin_obj *obj); 
 struct dwin_page *dwin_page_current(void); 
 struct dwin_page *dwin_page_get_from_id(rt_uint16_t id); 
 rt_err_t dwin_page_jump(struct dwin_page *page); 

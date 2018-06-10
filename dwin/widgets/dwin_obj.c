@@ -23,7 +23,7 @@ void dwin_obj_init(struct dwin_obj *obj, rt_uint16_t addr, rt_uint8_t size, enum
     obj->active     = RT_TRUE; 
 }
 
-rt_err_t dwin_obj_active(struct dwin_obj *obj, rt_bool_t active)
+rt_err_t dwin_obj_set_active(struct dwin_obj *obj, rt_bool_t active)
 {
     RT_ASSERT(obj != RT_NULL); 
     

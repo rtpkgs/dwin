@@ -23,8 +23,11 @@ struct dwin_button
 }; 
 typedef struct dwin_button* dwin_button_t; 
 
+rt_err_t dwin_button_init(void); 
 struct dwin_button *dwin_button_create(struct dwin_page *page, rt_uint16_t addr, 
     void (*push_cb)(void)); 
-rt_err_t dwin_button_init(void); 
+rt_err_t dwin_button_delect(struct dwin_button *button); 
+rt_err_t dwin_button_set_callback(struct dwin_button *button, void (*cb)(void)); 
+rt_err_t dwin_button_set_active(struct dwin_button *button, rt_bool_t active); 
 
 #endif 

@@ -15,7 +15,8 @@
 
 #include "dwin_def.h" 
 
-struct dwin_parse *dwin_parse_create(enum dwin_obj_type type, void (*event)(struct dwin_obj *obj)); 
+struct dwin_parse *dwin_parse_create(enum dwin_obj_type type, 
+    void (*event)(struct dwin_obj *obj, uint8_t *data, uint8_t len)); 
 rt_err_t dwin_parse_delect(struct dwin_parse *parse); 
 #define dwin_parse_delect_safe(parse)          \
 do{                                            \

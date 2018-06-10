@@ -25,7 +25,9 @@ rt_inline rt_uint16_t dwin_parse_size(uint8_t *data)
     return data[6]; 
 }
 
-struct dwin_parse *dwin_parse_create(enum dwin_obj_type type, void (*event)(struct dwin_obj *obj))
+/* Todo: 优雅化 */ 
+struct dwin_parse *dwin_parse_create(enum dwin_obj_type type, 
+    void (*event)(struct dwin_obj *obj, uint8_t *data, uint8_t len))
 {
     struct dwin_parse *parse = RT_NULL; 
     
@@ -71,9 +73,7 @@ rt_err_t dwin_parse_register(struct dwin_parse *parse)
     return RT_EOK; 
 }
 
-/* Todo: 移除解析器 */ 
-
-/* Todo: 待优化结构, 和思考如何和控件优雅的分离, 控件解析注册机制??? */ 
+/* Todo: 低优先级线程, 邮箱FIFO机制处理事件 */ 
 void dwin_parse_exe(uint8_t *data, uint8_t len)
 {
     rt_list_t *list = RT_NULL; 
@@ -110,7 +110,7 @@ void dwin_parse_exe(uint8_t *data, uint8_t len)
             
             if((parse->type == obj_widget->type) && (parse->event != RT_NULL))
             {
-                parse->event(obj_widget); 
+                parse->event(obj_widget, data, len); 
                 return; 
             }
         }

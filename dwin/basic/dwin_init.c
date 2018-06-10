@@ -16,6 +16,7 @@
 
 /* 控件头文件 */ 
 #include "dwin_button.h" 
+#include "dwin_scale.h" 
 
 struct dwin dwin = {0}; 
 
@@ -40,9 +41,14 @@ int dwin_init(void)
     dwin.parse_num = 0; 
     
     /* 打印信息 */ 
+#if defined(DWIN_USING_DEBUG)
     DWIN_PRINT("\n");
     DWIN_INFO("Welcome to the dwin \033[32mv%d.%d.%d\033[0m lib.\n", DWIN_VERSION_M, DWIN_VERSION_S, DWIN_VERSION_R); 
     DWIN_INFO("You can find the laster from <\033[31mhttps://github.com/liu2guang/dwin\033[0m>.\n\n"); 
+#else
+    DWIN_INFO("Welcome to the dwin \033[32mv%d.%d.%d\033[0m lib.\n", DWIN_VERSION_M, DWIN_VERSION_S, DWIN_VERSION_R); 
+    DWIN_INFO("You can find the laster from <\033[31mhttps://github.com/liu2guang/dwin\033[0m>.\n"); 
+#endif 
     
     /* 启动自动上传数据监听器 */ 
     extern rt_err_t dwin_watch_init(dwin_t dwin, const char *name, rt_uint32_t baudrate); 
@@ -53,7 +59,9 @@ int dwin_init(void)
         return ret; 
     } 
     
+#if defined(DWIN_USING_DEBUG)
     DWIN_PRINT("\n"); 
+#endif 
     dwin_system_touch(RT_TRUE); 
     
     /* 检测屏幕运行配置, 当非配置为以下功能时, dwin库无法正常工作:
@@ -94,6 +102,7 @@ int dwin_init(void)
     
     /* 初始化控件(注册控件解析器) */ 
     dwin_button_init(); 
+    dwin_scale_init(); 
     
     return RT_EOK; 
 }
