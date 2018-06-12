@@ -35,6 +35,10 @@
 #define DWIN_USING_HEADL    0xA5
 #endif
 
+#ifndef DWIN_USING_DATA_FRAME_DEPTH
+#define DWIN_USING_DATA_FRAME_DEPTH 8 
+#endif 
+
 #define DWIN_USING_NUM_MAX_PER_PAGE 64 /* 64 or 128 */ 
 
 #if   (DWIN_USING_TYPE == 0)

@@ -30,7 +30,7 @@ static void dwin_data_init(struct dwin *dwin)
     dwin->page_cur = RT_NULL; 
     rt_list_init(&(dwin->parses));
     dwin->parse_num = 0; 
-    dwin->parse_mq = rt_mq_create("dwin_parse", sizeof(struct dwin_data_frame), 10, RT_IPC_FLAG_FIFO); 
+    dwin->parse_mq = rt_mq_create("dwin_parse", sizeof(struct dwin_data_frame), DWIN_USING_DATA_FRAME_DEPTH, RT_IPC_FLAG_FIFO); 
 }
 
 static void dwin_verion_output(void)
