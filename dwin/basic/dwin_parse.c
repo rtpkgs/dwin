@@ -95,7 +95,10 @@ rt_err_t dwin_parse_unregister(struct dwin_parse *parse)
 /* Todo: 低优先级线程, 消息队列FIFO机制处理事件 */ 
 void dwin_parse_exe(rt_uint8_t *data, rt_uint8_t len)
 {
-    rt_list_t *list = RT_NULL; 
+    rt_list_t *list_widget = RT_NULL; 
+    rt_list_t *list_parse  = RT_NULL; 
+    
+    struct dwin_parse *parse = RT_NULL; 
     
     /* 获取当前页面 */ 
     rt_uint16_t pageid = 0; 
@@ -106,41 +109,36 @@ void dwin_parse_exe(rt_uint8_t *data, rt_uint8_t len)
     RT_ASSERT(data != RT_NULL); 
     
     /* 遍历当前页中所有控件, 查找地址和长度匹配并且激活的obj控件对象 */ 
-    
-    struct dwin_obj *obj_temp = RT_NULL; 
+    struct dwin_obj *obj_temp   = RT_NULL; 
     struct dwin_obj *obj_widget = RT_NULL; 
     
-    for(list = page->objs.next; list != &(page->objs); list = list->next)
+    for(list_widget = page->objs.next; list_widget != &(page->objs); list_widget = list_widget->next)
     {
-        obj_temp = rt_list_entry(list, struct dwin_obj, list); 
+        obj_temp = rt_list_entry(list_widget, struct dwin_obj, list); 
         
         if((obj_temp->value_addr == dwin_parse_addr(data)) && 
            (obj_temp->value_size == dwin_parse_size(data)) && 
            (obj_temp->active == RT_TRUE))
         {
             obj_widget = obj_temp;
-            break;
-        }
-    }
-    
-    /* 按照注册的方式处理控件事件 */ 
-    struct dwin_parse *parse = RT_NULL; 
-    
-    if(obj_widget != RT_NULL)
-    {
-        for(list = dwin.parses.next; list != &(dwin.parses); list = list->next)
-        {
-            parse = rt_list_entry(list, struct dwin_parse, list); 
             
-            if((parse->type == obj_widget->type) && (parse->event != RT_NULL))
+            for(list_parse = dwin.parses.next; list_parse != &(dwin.parses); list_parse = list_parse->next)
             {
-                parse->event(obj_widget, data, len); 
-                return; 
+                parse = rt_list_entry(list_parse, struct dwin_parse, list); 
+                
+                if((parse->type == obj_widget->type) && (parse->event != RT_NULL))
+                {
+                    parse->event(obj_widget, data, len); 
+                    break; 
+                }
             }
         }
     }
     
-    DWIN_DBG("The data frame no find widget parse.\n"); 
+    if(obj_widget == RT_NULL)
+    {
+        DWIN_DBG("The data frame no find widget parse.\n"); 
+    }
 }
 
 rt_err_t dwin_parse_send(struct dwin_data_frame *data)

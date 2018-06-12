@@ -27,6 +27,11 @@ typedef struct dwin_scale* dwin_scale_t;
 
 rt_err_t dwin_scale_init(void); 
 struct dwin_scale *dwin_scale_create(struct dwin_page *page, rt_uint16_t addr, 
-    void (*cb)(rt_uint16_t value)); 
+    void (*cb)(rt_uint16_t value), rt_uint16_t init_value); 
+rt_err_t dwin_scale_delect(struct dwin_scale *scale); 
+rt_err_t dwin_scale_set_callback(struct dwin_scale *scale, void (*cb)(rt_uint16_t value)); 
+rt_err_t dwin_scale_set_active(struct dwin_scale *scale, rt_bool_t active); 
+rt_err_t dwin_scale_get_value(struct dwin_scale *scale, rt_uint16_t *value); 
+rt_err_t dwin_scale_set_value(struct dwin_scale *scale, rt_uint16_t value); 
 
 #endif 
