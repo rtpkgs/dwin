@@ -119,6 +119,13 @@ struct dwin_rtc
 }; 
 typedef struct dwin_rtc *dwin_rtc_t; 
 
+struct dwin_data_frame
+{
+    rt_uint8_t data[256]; 
+    rt_uint8_t len; 
+}; 
+typedef struct dwin_data_frame* dwin_data_frame_t; 
+
 struct dwin_watch
 {
     rt_device_t serial; 
@@ -126,7 +133,8 @@ struct dwin_watch
     rt_sem_t rxsem; 
     rt_thread_t thread; 
     
-    uint8_t data[256]; 
+    //rt_uint8_t data[256]; 
+    struct dwin_data_frame data; 
 }; 
 typedef struct dwin_watch *dwin_watch_t; 
 
@@ -177,7 +185,9 @@ struct dwin
     
     /* 控件解析器链表 */ 
     rt_list_t parses;           /* 解析器链表 */ 
-    rt_uint8_t parse_num;       /* 解析器数量 */
+    rt_uint8_t parse_num;       /* 解析器数量 */ 
+    rt_mq_t parse_mq;           /* 解析器消息队列 */ 
+    rt_thread_t parse_thread;   /* 解析器线程 */ 
 }; 
 typedef struct dwin *dwin_t; 
 

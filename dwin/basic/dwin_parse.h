@@ -23,5 +23,7 @@ do{                                            \
     dwin_parse_delect(parse); parse = RT_NULL; \
 }while(0) 
 rt_err_t dwin_parse_register(struct dwin_parse *parse); 
+rt_err_t dwin_parse_unregister(struct dwin_parse *parse); 
+rt_err_t dwin_parse_send(struct dwin_data_frame *data); 
 
 #endif 

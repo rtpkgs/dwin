@@ -230,7 +230,7 @@ rt_err_t dwin_system_jump(rt_uint16_t page)
         goto failed;
     }
 
-    DWIN_DBG("The dwin jump %d page.\n", page);
+    DWIN_DBG("The dwin jump page %d.\n", page);
     return RT_EOK;
 #endif
 

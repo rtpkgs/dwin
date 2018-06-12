@@ -78,7 +78,7 @@ static void dwin_watch_run(void *p)
         {
             if(ch == DWIN_USING_HEADH) 
             {
-                watch.data[index++] = ch; 
+                watch.data.data[index++] = ch; 
                 state = DWIN_WATCH_STATE_HEADH; 
                 continue; 
             }
@@ -95,7 +95,7 @@ static void dwin_watch_run(void *p)
         {
             if(ch == DWIN_USING_HEADL)
             {
-                watch.data[index++] = ch; 
+                watch.data.data[index++] = ch; 
                 state = DWIN_WATCH_STATE_HEADL;
                 continue;
             }
@@ -109,33 +109,38 @@ static void dwin_watch_run(void *p)
         
         if(state == DWIN_WATCH_STATE_HEADL)
         {
-            watch.data[index++] = ch;
+            watch.data.data[index++] = ch;
             state = DWIN_WATCH_STATE_DATE;
             continue;
         }
         
         if(state == DWIN_WATCH_STATE_DATE)
         {
-            watch.data[index++] = ch; 
+            watch.data.data[index++] = ch; 
             
-            if(index == watch.data[2] + 3)
+            if(index == watch.data.data[2] + 3)
             {
 #ifdef DWIN_USING_DEBUG
-                DWIN_DBG("Listen to \033[31m%.3dByte\033[0m data: {", watch.data[2]+3); 
+                DWIN_DBG("Listento \033[31m%.3dByte\033[0m data: {", watch.data.data[2]+3); 
 
-                for(index = 0; index < (watch.data[2]+3); index++) 
+                for(index = 0; index < (watch.data.data[2]+3); index++) 
                 {
-                    DWIN_PRINT("\033[32m0x%.2x\033[0m ", watch.data[index]); 
+                    DWIN_PRINT("\033[32m0x%.2x\033[0m ", watch.data.data[index]); 
                 }
                 DWIN_PRINT("\b}.\n");
 #endif
-                /* 异步解析数据 */ 
-                extern void dwin_parse_exe(uint8_t *data, uint8_t len); 
-                dwin_parse_exe(watch.data, watch.data[2]); 
+                /* 异步解析数据: 发送消息队列给自动上传数据解析器 */ 
+                watch.data.len = watch.data.data[2]+3; 
+                extern rt_err_t dwin_parse_send(struct dwin_data_frame *data); 
+                dwin_parse_send(&(watch.data)); 
+                
+                /* old code: 需要被移除 */ 
+                //extern void dwin_parse_exe(rt_uint8_t *data, rt_uint8_t len); 
+                //dwin_parse_exe(watch.data.data, watch.data.len); 
                 
                 index = 0;
                 state = DWIN_WATCH_STATE_IDLE;
-                rt_memset(watch.data, 0x00, sizeof(watch.data));
+                rt_memset(watch.data.data, 0x00, sizeof(watch.data.data));
                 
                 continue;
             }
@@ -149,7 +154,7 @@ static rt_err_t dwin_watch_start(void)
     watch.thread = rt_thread_create("twatch", dwin_watch_run, RT_NULL, 2048, 6, 10); 
     if(watch.thread == RT_NULL) 
     {
-        DWIN_DBG("Dwin auto upload watch thread create failed.\n"); 
+        DWIN_DBG("The dwin auto upload watch thread create failed.\n"); 
         return RT_ENOSYS; 
     }
 
@@ -167,7 +172,7 @@ static rt_err_t dwin_watch_stop(void)
     ret = rt_thread_delete(watch.thread); 
     if(ret != RT_EOK)
     {
-        DWIN_DBG("Dwin auto upload watch thread delete failed.\n"); 
+        DWIN_DBG("The dwin auto upload watch thread delete failed.\n"); 
         return RT_ENOSYS; 
     }
     
