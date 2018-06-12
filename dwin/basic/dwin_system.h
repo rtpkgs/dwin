@@ -16,12 +16,35 @@
 
 #include "dwin_def.h" 
 
-rt_err_t dwin_system_get_cpuid(rt_uint16_t *cpuid); 
-rt_err_t dwin_system_reset(void); 
-rt_err_t dwin_system_get_version(rt_uint16_t *ver); 
-rt_err_t dwin_system_get_rtc(rt_uint8_t *year, rt_uint8_t *mon, rt_uint8_t *day, rt_uint8_t *hour, rt_uint8_t *min, rt_uint8_t *sec); 
-rt_err_t dwin_system_set_rtc(rt_uint8_t year, rt_uint8_t mon, rt_uint8_t day, rt_uint8_t hour, rt_uint8_t min, rt_uint8_t sec); 
-rt_err_t dwin_system_get_page(rt_uint16_t *page); 
-rt_err_t dwin_system_set_page(rt_uint16_t page); 
+/* 通用API */ 
+rt_err_t dwin_system_version(rt_uint32_t *ver_sn); 
+rt_err_t dwin_system_get_backlight(rt_uint8_t *level); 
+rt_err_t dwin_system_set_backlight(rt_uint8_t level); 
+rt_err_t dwin_system_buzz(rt_uint8_t tick); 
+rt_err_t dwin_system_jump(rt_uint16_t page); 
+rt_err_t dwin_system_page(rt_uint16_t *page);
+rt_err_t dwin_system_touch(rt_bool_t enable); 
+rt_err_t dwin_system_get_rtc(struct dwin_rtc *rtc); 
+rt_err_t dwin_system_set_rtc(struct dwin_rtc rtc); 
+rt_err_t dwin_system_get_timestamp(time_t *timestamp); 
+rt_err_t dwin_system_set_timestamp(time_t timestamp); 
+rt_err_t dwin_system_key(rt_uint8_t code); 
+rt_err_t dwin_system_dir(enum dwin_dir dir); 
+rt_err_t dwin_system_var_from_l22_upload(rt_bool_t *enable); 
+rt_err_t dwin_system_backlight_by_touch_ctr(rt_bool_t *enable); 
+rt_err_t dwin_system_crc(rt_bool_t *enable); 
+
+/* 特有API */ 
+#if (DWIN_USING_TYPE == 0) 
+
+#endif 
+
+#if (DWIN_USING_TYPE == 1) 
+
+#endif 
+
+#if (DWIN_USING_TYPE == 2) 
+
+#endif 
 
 #endif 

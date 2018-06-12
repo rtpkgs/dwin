@@ -10,10 +10,12 @@ inc = []
 # add dwin basic include
 inc = inc + [cwd]
 inc = inc + [cwd + "/basic"]
+inc = inc + [cwd + "/widgets"]
 
 # add dwin basic code
 src = src + Glob('./*.c')
 src = src + Glob('./basic/*.c')
+src = src + Glob('./widgets/*.c')
 
 group = DefineGroup('dwin', src, depend = ['PKG_USING_DWIN'], CPPPATH = inc)
 
