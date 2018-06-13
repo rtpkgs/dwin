@@ -117,7 +117,6 @@ void dwin_parse_exe(rt_uint8_t *data, rt_uint8_t len)
         obj_temp = rt_list_entry(list_widget, struct dwin_obj, list); 
         
         if((obj_temp->value_addr == dwin_parse_addr(data)) && 
-           (obj_temp->value_size == dwin_parse_size(data)) && 
            (obj_temp->active == RT_TRUE))
         {
             obj_widget = obj_temp;

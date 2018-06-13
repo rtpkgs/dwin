@@ -87,6 +87,8 @@ do{                                                \
 }while(0)
 #endif
 
+#define DWIN_OBJ_VARY_LENGHT 0xFF 
+
 enum dwin_dir
 {
     DWIN_DIR_000 = 0, 
