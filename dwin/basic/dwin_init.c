@@ -12,12 +12,7 @@
  */ 
 
 #include "dwin_init.h" 
-#include "dwin_system.h"
-
-/* 控件头文件 */ 
-#include "dwin_button.h" 
-#include "dwin_scale.h" 
-#include "dwin_input.h"
+#include "dwin.h"
 
 struct dwin dwin = {0}; 
 
@@ -76,6 +71,7 @@ static rt_err_t dwin_widgets_init(void)
     dwin_button_init(); 
     dwin_scale_init(); 
     dwin_input_init();
+    dwin_number_init(); 
     
     return RT_EOK; 
 }

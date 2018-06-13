@@ -46,6 +46,8 @@ struct dwin_scale *dwin_scale_create(struct dwin_page *page, rt_uint16_t addr, v
 {
     struct dwin_scale *scale = RT_NULL; 
     
+    RT_ASSERT(page != RT_NULL); 
+    
     scale = (struct dwin_scale *)rt_malloc(sizeof(struct dwin_scale)); 
     if(scale == RT_NULL)
     {

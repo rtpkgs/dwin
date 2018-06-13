@@ -27,5 +27,6 @@
 #include "dwin_button.h" 
 #include "dwin_scale.h" 
 #include "dwin_input.h"
+#include "dwin_number.h"
 
 #endif 

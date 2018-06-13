@@ -51,9 +51,13 @@
 
 #define DWIN_VAR_ADDR(addr) (DWIN_VAR_BASE_ADDR+(addr))
 
-#define DWIN_GET_BYTEH(short)  (rt_uint8_t)(((short) & 0xFF00) >> 8)
-#define DWIN_GET_BYTEL(short)  (rt_uint8_t)(((short) & 0x00FF) >> 0)
-#define DWIN_SET_SHORT(b1, b2) (rt_uint16_t)(((b1)<<8) | ((b2)&0xff))
+#define DWIN_GET_BYTEH(short)  ((rt_uint8_t)(((short) & 0xFF00) >> 8))
+#define DWIN_GET_BYTEL(short)  ((rt_uint8_t)(((short) & 0x00FF) >> 0))
+#define DWIN_SET_SHORT(b1, b2) ((rt_uint16_t)(((b1)<<8) | ((b2)&0xff)))
+
+#define DWIN_GET_SHORTH(int) ((rt_uint16_t)(((int) & 0xFFFF0000) >> 16))
+#define DWIN_GET_SHORTL(int) ((rt_uint16_t)(((int) & 0x0000FFFF) >>  0))
+#define DWIN_SET_INT(b1, b2) ((rt_uint32_t)(((b1)<<16) | ((b2)&0xffff)))
 
 /* µ÷ÊÔÐÅÏ¢ */ 
 #define DWIN_PRINT(fmt, ...)              \

@@ -21,11 +21,6 @@ rt_inline rt_uint16_t dwin_parse_addr(uint8_t *data)
     return (data[4]<<8) + data[5]; 
 }
 
-rt_inline rt_uint16_t dwin_parse_size(uint8_t *data)
-{
-    return data[6]; 
-}
-
 /* ´´½¨½âÎöÆ÷ */ 
 struct dwin_parse *dwin_parse_create(enum dwin_obj_type type, 
     void (*event)(struct dwin_obj *obj, uint8_t *data, uint8_t len))
