@@ -36,7 +36,8 @@ static void dwin_input_event(struct dwin_obj *obj, uint8_t *data, uint8_t len)
         i++;
     }
     input->input_str[i] = 0;
-    input->input_cb(input->input_str);
+    *input->str_len = i;
+    input->input_cb(input->input_str,input->str_len);
 }
 
 /* 初始化input控件解析器 */
@@ -51,7 +52,7 @@ rt_err_t dwin_input_init(void)
     return RT_EOK;
 }
 
-struct dwin_input *dwin_input_create(struct dwin_page *page, rt_uint16_t addr, void (*cb)(char *str))
+struct dwin_input *dwin_input_create(struct dwin_page *page, rt_uint16_t addr, void (*cb)(char *str,rt_uint32_t *len),rt_uint32_t *len)
 {
     struct dwin_input *input = RT_NULL;
 
@@ -65,7 +66,8 @@ struct dwin_input *dwin_input_create(struct dwin_page *page, rt_uint16_t addr, v
     dwin_obj_init(&(input->obj), addr, DWIN_OBJ_VARY_LENGHT, DWIN_WIDGET_TYPE_INPUT);
     dwin_page_add_obj(page, &(input->obj));
     input->input_cb = cb;
-
+    input->str_len = len;
+    
     return input;
 
 failed:
@@ -87,7 +89,7 @@ rt_err_t dwin_input_delect(struct dwin_input *input)
     return RT_EOK;
 }
 
-rt_err_t dwin_input_set_callback(struct dwin_input *input, void (*cb)(char *str))
+rt_err_t dwin_input_set_callback(struct dwin_input *input, void (*cb)(char *str,rt_uint32_t *len))
 {
     RT_ASSERT(input != RT_NULL);
     RT_ASSERT(cb     != RT_NULL);
