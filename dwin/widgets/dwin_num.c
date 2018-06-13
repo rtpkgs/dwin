@@ -17,12 +17,12 @@
 #include "dwin_trans.h" 
 
 /* 初始化控件解析器 */ 
-rt_err_t dwin_number_init(void)
+rt_err_t dwin_num_init(void)
 {
     return RT_EOK; 
 }
 
-struct dwin_num *dwin_number_create(struct dwin_page *page, rt_uint16_t addr, enum dwin_number_type type)
+struct dwin_num *dwin_num_create(struct dwin_page *page, rt_uint16_t addr, enum dwin_num_type type)
 {
     struct dwin_num *number = RT_NULL; 
     
@@ -37,21 +37,21 @@ struct dwin_num *dwin_number_create(struct dwin_page *page, rt_uint16_t addr, en
     
     switch(type)
     {
-        case DWIN_NUMBER_TYPE_S16:
-        case DWIN_NUMBER_TYPE_U16:
+        case DWIN_NUM_TYPE_S16:
+        case DWIN_NUM_TYPE_U16:
         {
             dwin_obj_init(&(number->obj), addr, 1, DWIN_WIDGET_TYPE_NUM); 
         }
         break; 
         
-        case DWIN_NUMBER_TYPE_S32:
-        case DWIN_NUMBER_TYPE_U32: 
+        case DWIN_NUM_TYPE_S32:
+        case DWIN_NUM_TYPE_U32: 
         {
             dwin_obj_init(&(number->obj), addr, 2, DWIN_WIDGET_TYPE_NUM); 
         }
         break; 
             
-        case DWIN_NUMBER_TYPE_U64:
+        case DWIN_NUM_TYPE_U64:
         {
             dwin_obj_init(&(number->obj), addr, 4, DWIN_WIDGET_TYPE_NUM); 
         }
@@ -79,7 +79,7 @@ failed:
     return RT_NULL; 
 }
 
-rt_err_t dwin_number_delect(struct dwin_num *number)
+rt_err_t dwin_num_delect(struct dwin_num *number)
 {
     RT_ASSERT(number != RT_NULL); 
     
@@ -89,12 +89,12 @@ rt_err_t dwin_number_delect(struct dwin_num *number)
     return RT_EOK; 
 } 
 
-rt_err_t dwin_number_get_value_s16(struct dwin_num *number, rt_int16_t *value)
+rt_err_t dwin_num_get_value_s16(struct dwin_num *number, rt_int16_t *value)
 {
     rt_uint16_t data[1] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_S16); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_S16); 
     
     dwin_var_read(number->obj.value_addr, data, 1); 
     *value = (rt_int16_t)data[0]; 
@@ -102,12 +102,12 @@ rt_err_t dwin_number_get_value_s16(struct dwin_num *number, rt_int16_t *value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_get_value_u16(struct dwin_num *number, rt_uint16_t *value)
+rt_err_t dwin_num_get_value_u16(struct dwin_num *number, rt_uint16_t *value)
 {
     rt_uint16_t data[1] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_U16); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_U16); 
     
     dwin_var_read(number->obj.value_addr, data, 1); 
     *value = (rt_uint16_t)data[0]; 
@@ -115,12 +115,12 @@ rt_err_t dwin_number_get_value_u16(struct dwin_num *number, rt_uint16_t *value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_get_value_s32(struct dwin_num *number, rt_int32_t *value)
+rt_err_t dwin_num_get_value_s32(struct dwin_num *number, rt_int32_t *value)
 {
     rt_uint16_t data[2] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_S32); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_S32); 
     
     dwin_var_read(number->obj.value_addr, data, 2); 
     *value =  (rt_int32_t)DWIN_SET_INT(data[0], data[1]); 
@@ -128,12 +128,12 @@ rt_err_t dwin_number_get_value_s32(struct dwin_num *number, rt_int32_t *value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_get_value_u32(struct dwin_num *number, rt_uint32_t *value)
+rt_err_t dwin_num_get_value_u32(struct dwin_num *number, rt_uint32_t *value)
 {
     rt_uint16_t data[2] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_U32); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_U32); 
     
     dwin_var_read(number->obj.value_addr, data, 2); 
     *value =  (rt_uint32_t)DWIN_SET_INT(data[0], data[1]); 
@@ -141,12 +141,12 @@ rt_err_t dwin_number_get_value_u32(struct dwin_num *number, rt_uint32_t *value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_get_value_u64(struct dwin_num *number, uint64_t *value)
+rt_err_t dwin_num_get_value_u64(struct dwin_num *number, uint64_t *value)
 {
     rt_uint16_t data[4] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_U64); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_U64); 
     
     dwin_var_read(number->obj.value_addr, data, 4); 
     *value = (((uint64_t)data[0]) << 48) + (((uint64_t)data[1]) << 32) + 
@@ -155,12 +155,12 @@ rt_err_t dwin_number_get_value_u64(struct dwin_num *number, uint64_t *value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_set_value_s16(struct dwin_num *number, rt_int16_t value)
+rt_err_t dwin_num_set_value_s16(struct dwin_num *number, rt_int16_t value)
 {
     rt_uint16_t data[1] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_S16); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_S16); 
     
     data[0] = (rt_uint16_t)value; 
     dwin_var_write(number->obj.value_addr, data, 1); 
@@ -168,12 +168,12 @@ rt_err_t dwin_number_set_value_s16(struct dwin_num *number, rt_int16_t value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_set_value_u16(struct dwin_num *number, rt_uint16_t value)
+rt_err_t dwin_num_set_value_u16(struct dwin_num *number, rt_uint16_t value)
 {
     rt_uint16_t data[1] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_U16); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_U16); 
     
     data[0] = (rt_uint16_t)value; 
     dwin_var_write(number->obj.value_addr, data, 1); 
@@ -181,12 +181,12 @@ rt_err_t dwin_number_set_value_u16(struct dwin_num *number, rt_uint16_t value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_set_value_s32(struct dwin_num *number, rt_int32_t value)
+rt_err_t dwin_num_set_value_s32(struct dwin_num *number, rt_int32_t value)
 {
     rt_uint16_t data[2] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_S32); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_S32); 
     
     data[0] = (rt_uint16_t)DWIN_GET_SHORTH(value); 
     data[1] = (rt_uint16_t)DWIN_GET_SHORTL(value); 
@@ -195,12 +195,12 @@ rt_err_t dwin_number_set_value_s32(struct dwin_num *number, rt_int32_t value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_set_value_u32(struct dwin_num *number, rt_uint32_t value)
+rt_err_t dwin_num_set_value_u32(struct dwin_num *number, rt_uint32_t value)
 {
     rt_uint16_t data[2] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_U32); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_U32); 
     
     data[0] = (rt_uint16_t)DWIN_GET_SHORTH(value); 
     data[1] = (rt_uint16_t)DWIN_GET_SHORTL(value); 
@@ -209,12 +209,12 @@ rt_err_t dwin_number_set_value_u32(struct dwin_num *number, rt_uint32_t value)
     return RT_EOK; 
 }
 
-rt_err_t dwin_number_set_value_u64(struct dwin_num *number, uint64_t value)
+rt_err_t dwin_num_set_value_u64(struct dwin_num *number, uint64_t value)
 {
     rt_uint16_t data[4] = {0}; 
     
     RT_ASSERT(number != RT_NULL); 
-    RT_ASSERT(number->type != DWIN_NUMBER_TYPE_U64); 
+    RT_ASSERT(number->type != DWIN_NUM_TYPE_U64); 
     
     data[0] = (rt_uint16_t)((value >> 48) & (0xFFFF)); 
     data[1] = (rt_uint16_t)((value >> 32) & (0xFFFF));

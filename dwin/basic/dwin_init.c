@@ -71,7 +71,8 @@ static rt_err_t dwin_widgets_init(void)
     dwin_button_init(); 
     dwin_scale_init(); 
     dwin_gbk_input_init();
-    dwin_number_init(); 
+    dwin_num_init(); 
+    dwin_num_input_init(); 
     
     return RT_EOK; 
 }

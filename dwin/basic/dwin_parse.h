@@ -25,5 +25,6 @@ do{                                            \
 rt_err_t dwin_parse_register(struct dwin_parse *parse); 
 rt_err_t dwin_parse_unregister(struct dwin_parse *parse); 
 rt_err_t dwin_parse_send(struct dwin_data_frame *data); 
+void dwin_parse_register_info(void); 
 
 #endif 

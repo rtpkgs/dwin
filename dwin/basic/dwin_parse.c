@@ -87,6 +87,21 @@ rt_err_t dwin_parse_unregister(struct dwin_parse *parse)
     return RT_EOK; 
 }
 
+/* 打印已经注册解析器信息 */ 
+void dwin_parse_register_info(void)
+{
+    const char *parse_info[] = DWIN_WIDGET_TYPE_INFO; 
+    struct dwin_parse *parse = RT_NULL; 
+    rt_list_t *list_parse  = RT_NULL; 
+    
+    for(list_parse = dwin.parses.next; list_parse != &(dwin.parses); list_parse = list_parse->next)
+    {
+        parse = rt_list_entry(list_parse, struct dwin_parse, list); 
+        
+        DWIN_INFO("Parse: event 0x%.8x, type %s.\n", (rt_uint32_t)(parse->event), parse_info[parse->type]); 
+    }
+}
+
 /* Todo: 低优先级线程, 消息队列FIFO机制处理事件 */ 
 void dwin_parse_exe(rt_uint8_t *data, rt_uint8_t len)
 {
@@ -138,7 +153,7 @@ void dwin_parse_exe(rt_uint8_t *data, rt_uint8_t len)
 rt_err_t dwin_parse_send(struct dwin_data_frame *data)
 {
     return rt_mq_send(dwin.parse_mq, (void *)data, sizeof(struct dwin_data_frame)); 
-}
+} 
 
 /* 自动上传事件解析器 */ 
 void dwin_parse_run(void *p)

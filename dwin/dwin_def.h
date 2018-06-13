@@ -105,16 +105,28 @@ typedef enum dwin_dir dwin_dir_t;
 enum dwin_obj_type
 {
     DWIN_WIDGET_TYPE_BUTTON = 0, 
-    DWIN_WIDGET_TYPE_NUM, 
-    DWIN_WIDGET_TYPE_TEXT, 
-    DWIN_WIDGET_TYPE_GBK_INPUT, 
+    DWIN_WIDGET_TYPE_NUM,
     DWIN_WIDGET_TYPE_NUM_INPUT, 
+    DWIN_WIDGET_TYPE_GBK, 
+    DWIN_WIDGET_TYPE_GBK_INPUT, 
     DWIN_WIDGET_TYPE_SCALE, 
     DWIN_WIDGET_TYPE_ICON, 
     DWIN_WIDGET_TYPE_QRCODE, 
     DWIN_WIDGET_TYPE_MAX
 }; 
 typedef enum dwin_obj_type dwin_obj_type_t; 
+
+#define DWIN_WIDGET_TYPE_INFO                   \
+{                                               \
+    [DWIN_WIDGET_TYPE_BUTTON   ] = "Button",    \
+    [DWIN_WIDGET_TYPE_NUM      ] = "Number",    \
+    [DWIN_WIDGET_TYPE_NUM_INPUT] = "NumInput",  \
+    [DWIN_WIDGET_TYPE_GBK      ] = "GBK",       \
+    [DWIN_WIDGET_TYPE_GBK_INPUT] = "GBKInput",  \
+    [DWIN_WIDGET_TYPE_SCALE    ] = "Scale",     \
+    [DWIN_WIDGET_TYPE_ICON     ] = "Icon",      \
+    [DWIN_WIDGET_TYPE_QRCODE   ] = "QRCode"     \
+}; 
 
 struct dwin_rtc
 {
@@ -143,13 +155,10 @@ struct dwin_watch
     rt_uint32_t baudrate; 
     rt_sem_t rxsem; 
     rt_thread_t thread; 
-    
-    //rt_uint8_t data[256]; 
     struct dwin_data_frame data; 
 }; 
 typedef struct dwin_watch *dwin_watch_t; 
 
-/* Todo: 考虑回调函数移动到控件中去, 例如text没有解析回调函数 */ 
 struct dwin_obj
 {
     rt_list_t list; 

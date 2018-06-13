@@ -8,7 +8,7 @@
  *
  * Change Logs:
  * Date           Author       Notes
- * 2018-06-12     balanceTWK   implementing the input object.
+ * 2018-06-12     balanceTWK   implement the gbk input object. 
  */
 
 #include "dwin_gbk_input.h"
@@ -52,7 +52,7 @@ struct dwin_gbk_input *dwin_gbk_input_create(struct dwin_page *page, rt_uint16_t
     input = (struct dwin_gbk_input *)rt_malloc(sizeof(struct dwin_gbk_input));
     if (input == RT_NULL)
     {
-        DWIN_DBG("Create input failed memory is not enough.\n");
+        DWIN_DBG("Create gbk input failed memory is not enough.\n");
         goto failed;
     }
 

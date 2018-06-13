@@ -16,4 +16,18 @@
 
 #include "dwin_def.h" 
 
+struct dwin_num_input
+{
+    struct dwin_obj obj; 
+    void (*input_cb)(rt_uint32_t value);
+}; 
+typedef struct dwin_num_input* dwin_num_input_t; 
+
+rt_err_t dwin_num_input_init(void); 
+struct dwin_num_input *dwin_num_input_create(struct dwin_page *page, rt_uint16_t addr, 
+    void (*cb)(rt_uint32_t value)); 
+rt_err_t dwin_num_input_delect(struct dwin_num_input *input); 
+rt_err_t dwin_num_input_set_callback(struct dwin_num_input *input, void (*cb)(rt_uint32_t value)); 
+rt_err_t dwin_num_input_set_active(struct dwin_num_input *input, rt_bool_t active); 
+
 #endif 

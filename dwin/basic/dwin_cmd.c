@@ -14,6 +14,7 @@
 #include "dwin_cmd.h" 
 #include "dwin_trans.h" 
 #include "dwin_system.h" 
+#include "dwin_parse.h" 
 #include "finsh.h" 
 
 static rt_uint32_t str2int(const char *str)
@@ -53,7 +54,8 @@ static void uasge(uint8_t argc, char **argv)
     DWIN_PRINT("\033[36m  07. jump specified page    dwin -s jump <page>\033[0m\n"); 
     DWIN_PRINT("\033[36m  08. en or disable touch    dwin -s touch <enable|disable>\033[0m\n");
     DWIN_PRINT("\033[36m  09. set or read rtc        dwin -s rtc [year] [mon] [day] [hour] [min] [sec]\033[0m\n");
-    DWIN_PRINT("\033[36m  10. send keycode(0x01~FF)  dwin -s key <code>\033[0m\n");
+    DWIN_PRINT("\033[36m  10. send keycode(0x01~FF)  dwin -s key <code>\033[0m\n"); 
+    DWIN_PRINT("\033[36m  11. print register parse   dwin -d parse\033[0m\n"); 
 }
 
 static void uasge_t(uint8_t argc, char **argv)
@@ -92,6 +94,21 @@ static void uasge_s(uint8_t argc, char **argv)
     DWIN_PRINT("\033[36m  06. en or disable touch    dwin -s touch <enable|disable>\033[0m\n");
     DWIN_PRINT("\033[36m  07. set or read rtc        dwin -s rtc [year] [mon] [day] [hour] [min] [sec]\033[0m\n");
     DWIN_PRINT("\033[36m  08. send keycode(0x01~FF)  dwin -s key <code>\033[0m\n");
+}
+
+static void uasge_d(uint8_t argc, char **argv)
+{
+    rt_uint8_t index = 0; 
+    
+    DWIN_PRINT("\033[31mERR command format:\033[0m", argv[1]); 
+    for(;index < argc; index++) 
+    {
+        DWIN_PRINT(" %s", argv[index]); 
+    }
+    DWIN_PRINT("\n"); 
+    
+    DWIN_PRINT("\033[32mThe command format:\033[0m\n"); 
+    DWIN_PRINT("\033[36m  01. print register parse   dwin -d parse\033[0m\n"); 
 }
 
 /* 只有开启调试模式, 才有该命令 */ 
@@ -250,6 +267,20 @@ static int dwin_cmd(uint8_t argc, char **argv)
             else
             {
                 uasge_s(argc, argv); 
+                return RT_ERROR; 
+            }
+        }
+        
+        else if(!strcmp(argv[1], "-d") || !strcmp(argv[1], "--debug"))
+        {
+            if(!strcmp(argv[2], "parse"))
+            {
+                dwin_parse_register_info(); 
+            } 
+            
+            else
+            {
+                uasge_d(argc, argv); 
                 return RT_ERROR; 
             }
         }
