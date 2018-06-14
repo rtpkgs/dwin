@@ -147,3 +147,40 @@ rt_err_t dwin_page_jump_id(rt_uint16_t id)
 failed:
     return RT_ERROR; 
 }
+
+/* 打印已经注册解析器信息 */ 
+void dwin_page_obj_info(struct dwin_page *page)
+{
+    extern const char *widgets_info[]; 
+    rt_list_t *list = RT_NULL; 
+    struct dwin_obj *obj = RT_NULL; 
+    
+    for(list = page->objs.next; list != &(page->objs); list = list->next)
+    {
+        obj = rt_list_entry(list, struct dwin_obj, list); 
+        
+        if(obj->active)
+        {
+            DWIN_PRINT("\tObj: type %s, addr 0x%.4x, size %d, active enable.\n", widgets_info[obj->type], obj->value_addr, obj->value_size); 
+        }
+        else
+        {
+            DWIN_PRINT("\tObj: type %s, addr 0x%.4x, size %d, active disable.\n", widgets_info[obj->type], obj->value_addr, obj->value_size); 
+        }
+    }
+}
+
+/* 打印已经创建注册页面信息 */ 
+void dwin_page_info(void)
+{
+    rt_list_t *list = RT_NULL; 
+    struct dwin_page *page = RT_NULL; 
+    
+    for(list = dwin.pages.next; list != &(dwin.pages); list = list->next)
+    {
+        page = rt_list_entry(list, struct dwin_page, list); 
+        
+        DWIN_INFO("Page: id %.4d.\n", page->id); 
+        dwin_page_obj_info(page); 
+    }
+}

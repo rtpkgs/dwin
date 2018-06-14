@@ -60,6 +60,9 @@ struct dwin_gbk_input *dwin_gbk_input_create(struct dwin_page *page, rt_uint16_t
     dwin_page_add_obj(page, &(input->obj));
     input->input_cb = cb;
     
+    /* 输入框的初始化为0 */ 
+    dwin_gbk_input_write(input, " ", 1); 
+    
     return input;
 
 failed:
@@ -98,4 +101,14 @@ rt_err_t dwin_gbk_input_set_active(struct dwin_gbk_input *input, rt_bool_t activ
     dwin_obj_set_active(&(input->obj), active);
 
     return RT_EOK;
+}
+
+rt_err_t dwin_gbk_input_read(struct dwin_gbk_input *input, char *str, rt_uint8_t *len)
+{
+    return RT_EOK; 
+}
+
+rt_err_t dwin_gbk_input_write(struct dwin_gbk_input *input, char *str, rt_uint8_t len)
+{
+    return RT_EOK; 
 }

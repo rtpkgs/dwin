@@ -42,11 +42,11 @@
 #define DWIN_USING_NUM_MAX_PER_PAGE 64 /* 64 or 128 */ 
 
 #if   (DWIN_USING_TYPE == 0)
-#define DWIN_VAR_BASE_ADDR 0x0000
+#define DWIN_VAR_BASE_ADDR (0x0000)
 #elif (DWIN_USING_TYPE == 1)
-#define DWIN_VAR_BASE_ADDR 0x0000
+#define DWIN_VAR_BASE_ADDR (0x0000)
 #elif (DWIN_USING_TYPE == 2)
-#define DWIN_VAR_BASE_ADDR 0x1000
+#define DWIN_VAR_BASE_ADDR (0x1000)
 #endif 
 
 #define DWIN_VAR_ADDR(addr) (DWIN_VAR_BASE_ADDR+(addr))
@@ -91,7 +91,7 @@ do{                                                \
 }while(0)
 #endif
 
-#define DWIN_OBJ_VARY_LENGHT 0xFF 
+#define DWIN_OBJ_VARY_LENGHT (0xFF) 
 
 enum dwin_dir
 {
@@ -116,16 +116,16 @@ enum dwin_obj_type
 }; 
 typedef enum dwin_obj_type dwin_obj_type_t; 
 
-#define DWIN_WIDGET_TYPE_INFO                   \
-{                                               \
-    [DWIN_WIDGET_TYPE_BUTTON   ] = "Button",    \
-    [DWIN_WIDGET_TYPE_NUM      ] = "Number",    \
-    [DWIN_WIDGET_TYPE_NUM_INPUT] = "NumInput",  \
-    [DWIN_WIDGET_TYPE_GBK      ] = "GBK",       \
-    [DWIN_WIDGET_TYPE_GBK_INPUT] = "GBKInput",  \
-    [DWIN_WIDGET_TYPE_SCALE    ] = "Scale",     \
-    [DWIN_WIDGET_TYPE_ICON     ] = "Icon",      \
-    [DWIN_WIDGET_TYPE_QRCODE   ] = "QRCode"     \
+#define DWIN_WIDGET_TYPE_INFO                  \
+{                                              \
+    [DWIN_WIDGET_TYPE_BUTTON   ] = "Button  ", \
+    [DWIN_WIDGET_TYPE_NUM      ] = "Number  ", \
+    [DWIN_WIDGET_TYPE_NUM_INPUT] = "NumInput", \
+    [DWIN_WIDGET_TYPE_GBK      ] = "GBK     ", \
+    [DWIN_WIDGET_TYPE_GBK_INPUT] = "GBKInput", \
+    [DWIN_WIDGET_TYPE_SCALE    ] = "Scale   ", \
+    [DWIN_WIDGET_TYPE_ICON     ] = "Icon    ", \
+    [DWIN_WIDGET_TYPE_QRCODE   ] = "QRCode  "  \
 }; 
 
 struct dwin_rtc

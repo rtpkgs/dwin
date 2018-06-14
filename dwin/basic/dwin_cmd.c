@@ -15,6 +15,7 @@
 #include "dwin_trans.h" 
 #include "dwin_system.h" 
 #include "dwin_parse.h" 
+#include "dwin_page.h" 
 #include "finsh.h" 
 
 static rt_uint32_t str2int(const char *str)
@@ -56,6 +57,7 @@ static void uasge(uint8_t argc, char **argv)
     DWIN_PRINT("\033[36m  09. set or read rtc        dwin -s rtc [year] [mon] [day] [hour] [min] [sec]\033[0m\n");
     DWIN_PRINT("\033[36m  10. send keycode(0x01~FF)  dwin -s key <code>\033[0m\n"); 
     DWIN_PRINT("\033[36m  11. print register parse   dwin -d parse\033[0m\n"); 
+    DWIN_PRINT("\033[36m  12. print create pase      dwin -d page\033[0m\n"); 
 }
 
 static void uasge_t(uint8_t argc, char **argv)
@@ -109,6 +111,7 @@ static void uasge_d(uint8_t argc, char **argv)
     
     DWIN_PRINT("\033[32mThe command format:\033[0m\n"); 
     DWIN_PRINT("\033[36m  01. print register parse   dwin -d parse\033[0m\n"); 
+    DWIN_PRINT("\033[36m  02. print create pase      dwin -d page\033[0m\n"); 
 }
 
 /* 只有开启调试模式, 才有该命令 */ 
@@ -276,6 +279,11 @@ static int dwin_cmd(uint8_t argc, char **argv)
             if(!strcmp(argv[2], "parse"))
             {
                 dwin_parse_register_info(); 
+            } 
+            
+            else if(!strcmp(argv[2], "page"))
+            {
+                dwin_page_info(); 
             } 
             
             else

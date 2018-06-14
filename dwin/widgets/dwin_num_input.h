@@ -29,5 +29,7 @@ struct dwin_num_input *dwin_num_input_create(struct dwin_page *page, rt_uint16_t
 rt_err_t dwin_num_input_delect(struct dwin_num_input *input); 
 rt_err_t dwin_num_input_set_callback(struct dwin_num_input *input, void (*cb)(rt_uint32_t value)); 
 rt_err_t dwin_num_input_set_active(struct dwin_num_input *input, rt_bool_t active); 
+rt_err_t dwin_num_input_read(struct dwin_num_input *input, rt_uint32_t *value); 
+rt_err_t dwin_num_input_write(struct dwin_num_input *input, rt_uint32_t value); 
 
 #endif 

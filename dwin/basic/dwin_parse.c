@@ -90,7 +90,7 @@ rt_err_t dwin_parse_unregister(struct dwin_parse *parse)
 /* 打印已经注册解析器信息 */ 
 void dwin_parse_register_info(void)
 {
-    const char *parse_info[] = DWIN_WIDGET_TYPE_INFO; 
+    extern const char *widgets_info[]; 
     struct dwin_parse *parse = RT_NULL; 
     rt_list_t *list_parse  = RT_NULL; 
     
@@ -98,7 +98,7 @@ void dwin_parse_register_info(void)
     {
         parse = rt_list_entry(list_parse, struct dwin_parse, list); 
         
-        DWIN_INFO("Parse: event 0x%.8x, type %s.\n", (rt_uint32_t)(parse->event), parse_info[parse->type]); 
+        DWIN_INFO("Parse: event 0x%.8x, type %s.\n", (rt_uint32_t)(parse->event), widgets_info[parse->type]); 
     }
 }
 

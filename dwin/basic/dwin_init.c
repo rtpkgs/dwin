@@ -15,6 +15,7 @@
 #include "dwin.h"
 
 struct dwin dwin = {0}; 
+const char *widgets_info[] = DWIN_WIDGET_TYPE_INFO; 
 
 static void dwin_data_init(struct dwin *dwin)
 {

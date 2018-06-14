@@ -27,5 +27,7 @@ struct dwin_page *dwin_page_current(void);
 struct dwin_page *dwin_page_get_from_id(rt_uint16_t id); 
 rt_err_t dwin_page_jump(struct dwin_page *page); 
 rt_err_t dwin_page_jump_id(rt_uint16_t id); 
+void dwin_page_obj_info(struct dwin_page *page); 
+void dwin_page_info(void); 
 
 #endif 
