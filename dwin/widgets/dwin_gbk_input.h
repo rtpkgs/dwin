@@ -29,7 +29,7 @@ struct dwin_gbk_input *dwin_gbk_input_create(struct dwin_page *page, rt_uint16_t
 rt_err_t dwin_gbk_input_delect(struct dwin_gbk_input *input); 
 rt_err_t dwin_gbk_input_set_callback(struct dwin_gbk_input *input, void (*cb)(char *str, rt_uint8_t len)); 
 rt_err_t dwin_gbk_input_set_active(struct dwin_gbk_input *input, rt_bool_t active); 
-rt_err_t dwin_gbk_input_read(struct dwin_gbk_input *input, char *str, rt_uint8_t *len); 
+rt_err_t dwin_gbk_input_read(struct dwin_gbk_input *input, char *str, rt_uint8_t len); 
 rt_err_t dwin_gbk_input_write(struct dwin_gbk_input *input, char *str, rt_uint8_t len); 
 
 #endif 
