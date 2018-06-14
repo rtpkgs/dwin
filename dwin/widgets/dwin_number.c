@@ -40,20 +40,20 @@ struct dwin_number *dwin_number_create(struct dwin_page *page, rt_uint16_t addr,
         case DWIN_NUMBER_TYPE_S16:
         case DWIN_NUMBER_TYPE_U16:
         {
-            dwin_obj_init(&(number->obj), addr, 1, DWIN_WIDGET_TYPE_NUMBER); 
+            dwin_obj_init(&(number->obj), addr, 1, DWIN_WIDGET_TYPE_NUM); 
         }
         break; 
         
         case DWIN_NUMBER_TYPE_S32:
         case DWIN_NUMBER_TYPE_U32: 
         {
-            dwin_obj_init(&(number->obj), addr, 2, DWIN_WIDGET_TYPE_NUMBER); 
+            dwin_obj_init(&(number->obj), addr, 2, DWIN_WIDGET_TYPE_NUM); 
         }
         break; 
             
         case DWIN_NUMBER_TYPE_U64:
         {
-            dwin_obj_init(&(number->obj), addr, 4, DWIN_WIDGET_TYPE_NUMBER); 
+            dwin_obj_init(&(number->obj), addr, 4, DWIN_WIDGET_TYPE_NUM); 
         }
         break; 
         
