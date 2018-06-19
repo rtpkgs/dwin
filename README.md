@@ -6,7 +6,7 @@
 
 DWIN库是基于MIT开源协议开源的"dwin串口屏幕快速开发库". 该库需要工作在RT-Thread(后文简写RTT)物联网操作系统上, 整个DWIN库基于RTT底层设备层框架进行开发, 只要支持串口设备的RTT BSP都可以直接env在线安装DWIN库. 
 
- :tada: 示例效果与代码 :tada: 
+效果与代码
 -------------------
 
 ![dwin1](https://i.imgur.com/sxzFraT.jpg)
@@ -65,7 +65,7 @@ int main(void)
 }
 ~~~
 
- :tada: 功能简介 :tada:  
+功能简介
 -------------------
 
  功能 | 描述  
@@ -80,7 +80,7 @@ int main(void)
  num_input| 数字录入控件, 支持整数和浮点数录入
  cmd | RTT CMD调试功能
 
- :tada: CMD功能 :tada: 
+CMD功能
 -------------------
 
 ![dwin_cmd](https://i.imgur.com/FBmmMf1.png)
