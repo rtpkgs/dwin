@@ -87,18 +87,18 @@ CMD功能
 
  功能 | 描述  
  ---- | ----
- 读取变量和寄存器 | dwin -t r <reg|var> <addr> <len>
- 更改变量和寄存器 | dwin -t w <reg|var> <addr> <len> <data...>
+ 读取变量和寄存器 | dwin -t r <reg|var> <addr> <len> 
+ 更改变量和寄存器 | dwin -t w <reg|var> <addr> <len> <data...> 
  打印dwin版本信息 | dwin -s ver 
- 设置背光亮度 | dwin -s bl [level]
- 蜂鸣 | dwin -s buzz <tick>
- 获取当前页面 | dwin -s page
- 跳转页面 | dwin -s jump <page>
- 开启关闭触摸功能 | dwin -s touch <enable|disable>
- 设置或者读取 | dwin -s rtc [year] [mon] [day] [hour] [min] [sec]
- 发送软按键 | dwin -s key <code>
- 打印当前注册解析器信息 | dwin -d parse
- 打印当前页面与控件信息 | dwin -d page
+ 设置背光亮度 | dwin -s bl [level] 
+ 蜂鸣 | dwin -s buzz <tick> 
+ 获取当前页面 | dwin -s page 
+ 跳转页面 | dwin -s jump <page> 
+ 开启关闭触摸功能 | dwin -s touch <enable|disable> 
+ 设置或者读取 | dwin -s rtc [year] [mon] [day] [hour] [min] [sec] 
+ 发送软按键 | dwin -s key <code> 
+ 打印当前注册解析器信息 | dwin -d parse 
+ 打印当前页面与控件信息 | dwin -d page 
 
 :tada: 感谢 :tada: 
 -------------------
