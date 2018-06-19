@@ -98,7 +98,7 @@ void dwin_parse_register_info(void)
     {
         parse = rt_list_entry(list_parse, struct dwin_parse, list); 
         
-        DWIN_INFO("Parse: event 0x%.8x, type %s.\n", (rt_uint32_t)(parse->event), widgets_info[parse->type]); 
+        DWIN_INFO("Parse: type %s, event 0x%.8x.\n", widgets_info[parse->type], (rt_uint32_t)(parse->event)); 
     }
 }
 

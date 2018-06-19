@@ -55,9 +55,27 @@
 #define DWIN_GET_BYTEL(short)  ((rt_uint8_t)(((short) & 0x00FF) >> 0))
 #define DWIN_SET_SHORT(b1, b2) ((rt_uint16_t)(((b1)<<8) | ((b2)&0xff)))
 
-#define DWIN_GET_SHORTH(int) ((rt_uint16_t)(((int) & 0xFFFF0000) >> 16))
-#define DWIN_GET_SHORTL(int) ((rt_uint16_t)(((int) & 0x0000FFFF) >>  0))
-#define DWIN_SET_INT(b1, b2) ((rt_uint32_t)(((b1)<<16) | ((b2)&0xffff)))
+#define DWIN_GET_SHORTH(int)   ((rt_uint16_t)(((int) & 0xFFFF0000) >> 16))
+#define DWIN_GET_SHORTL(int)   ((rt_uint16_t)(((int) & 0x0000FFFF) >>  0))
+#define DWIN_SET_INT(b1, b2)   ((rt_uint32_t)(((b1)<<16) | ((b2)&0xffff)))
+
+/* 将char字符串转换成short字符串 */ 
+rt_inline rt_uint16_t *dwin_string_conv(rt_uint8_t *string) 
+{
+    rt_uint8_t temp  = 0; 
+    rt_uint8_t index = 0;
+    
+    RT_ASSERT(string != RT_NULL); 
+    
+    for(index = 0; index < rt_strlen((const char *)string); index+=2)
+    {
+        temp            = string[index+0]; 
+        string[index+0] = string[index+1];
+        string[index+1] = temp;
+    }
+    
+    return (rt_uint16_t *)string; 
+}
 
 /* 调试信息 */ 
 #define DWIN_PRINT(fmt, ...)              \

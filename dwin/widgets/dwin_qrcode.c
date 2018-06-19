@@ -17,66 +17,88 @@
 #include "dwin_trans.h"
 #include "string.h"
 
-rt_err_t dwin_qrcode_show_url(struct dwin_qrcode *qrcode, char *url)
+/* 初始化控件解析器 */ 
+rt_err_t dwin_qrcode_init(void)
 {
-    RT_ASSERT(qrcode != RT_NULL);
-    RT_ASSERT(url != RT_NULL);
-
-    rt_uint16_t data[2] = {0};
-    rt_uint8_t index = 4;
-    rt_uint16_t addr = qrcode->obj.value_addr;
-
-    dwin_var_read(addr, data, 2);
-    url[0] = (char)(data[0] >> 8);
-    url[1] = (char)data[0];
-    url[2] = (char)(data[1] >> 8);
-    url[3] = (char)data[1];
-    url[4] = (char)0x00;
-    addr += 2;
-    if ((!strcmp(url, "http")) || (!strcmp(url, "HTTP")) || (!strcmp(url, "WWW.")) || (!strcmp(url, "www.")))
-    {
-        for (rt_uint8_t i = 0; i <= 64; i++)
-        {
-            dwin_var_read(addr, data, 2);
-            addr += 2;
-            url[index] = (char)(data[0] >> 8);
-            url[index + 1] = (char)data[0];
-            url[index + 2] = (char)(data[1] >> 8);
-            url[index + 3] = (char)data[1];
-            for (rt_uint8_t x = 0; x < 4; x++)
-            {
-                if ((url[index + x] == (char)0xff) || (url[index + x] == (char)0x00))
-                {
-                    url[index + x] = 0x00;
-                    DWIN_DBG("url: %s \n", url);
-                    return RT_EOK;
-                }
-            }
-            index += 4;
-        }
-    }
-    else
-    {
-        DWIN_DBG("no network address found .\n");
-        return RT_ERROR;
-    }
+    return RT_EOK; 
 }
 
-rt_err_t dwin_qrcode_set_url(struct dwin_qrcode *qrcode, char *url)
+struct dwin_qrcode *dwin_qrcode_create(struct dwin_page *page, rt_uint16_t addr, rt_uint16_t max_len)
 {
-    RT_ASSERT(qrcode != RT_NULL);
-    RT_ASSERT(url != RT_NULL);
-
-    rt_uint16_t len = 0;
-    len = strlen(url);
-    len = len / 2 + len % 2;
-    rt_uint16_t data[len];
-
-    for (rt_uint16_t i = 0; i < len; i++)
+    struct dwin_qrcode *qrcode = RT_NULL; 
+    
+    RT_ASSERT(page    != RT_NULL); 
+    RT_ASSERT(max_len != 0); 
+    
+    qrcode = (struct dwin_qrcode *)rt_malloc(sizeof(struct dwin_qrcode)); 
+    if(qrcode == RT_NULL)
     {
-        data[i] = (rt_uint16_t)(url[i * 2] << 8) + (rt_uint16_t)(url[i * 2 + 1]);
+        DWIN_DBG("Create qrcode failed memory is not enough.\n"); 
+        goto failed; 
     }
+    
+    qrcode->max_len = max_len; 
+    dwin_obj_init(&(qrcode->obj), addr, DWIN_OBJ_VARY_LENGHT, DWIN_WIDGET_TYPE_QRCODE); 
+    dwin_obj_set_active(&(qrcode->obj), RT_TRUE); 
+    dwin_page_add_obj(page, &(qrcode->obj)); 
+    
+    return qrcode; 
+    
+failed:
+    if(qrcode != RT_NULL)
+    {
+        rt_free(qrcode); 
+    }
+    
+    return RT_NULL; 
+}
 
-    dwin_var_write(qrcode->obj.value_addr, data, len);
-    return RT_EOK;
+rt_err_t dwin_qrcode_delect(struct dwin_qrcode *qrcode)
+{
+    RT_ASSERT(qrcode != RT_NULL); 
+    
+    dwin_page_remove_obj(&(qrcode->obj)); 
+    rt_free(qrcode); 
+    
+    return RT_EOK; 
+} 
+
+rt_err_t dwin_qrcode_show_string(struct dwin_qrcode *qrcode, char *string)
+{
+    rt_uint16_t len = 0;
+    rt_uint16_t index = 0; 
+    
+    RT_ASSERT(qrcode != RT_NULL);
+    RT_ASSERT(string != RT_NULL);
+    
+    len = strlen(string); 
+    RT_ASSERT(((len/2 + len%2)*2) <= qrcode->max_len); 
+    
+    rt_uint8_t data[(len/2 + len%2)*2]; 
+    
+    rt_memset(data, 0x00, sizeof(data)); 
+ 
+    /* 复制数据 */
+    for(index = 0; index < len; index++)
+    {
+        data[index] = string[index]; 
+    }
+    
+    dwin_var_write(qrcode->obj.value_addr, dwin_string_conv(data), (len/2 + len%2));
+    return RT_EOK; 
+}
+
+rt_err_t dwin_qrcode_show_url(struct dwin_qrcode *qrcode, char *url)
+{
+    return dwin_qrcode_show_string(qrcode, url); 
+}
+
+rt_err_t dwin_qrcode_clear(struct dwin_qrcode *qrcode)
+{
+    rt_uint16_t data[qrcode->max_len]; 
+    
+    rt_memset(data, 0x00, sizeof(data)); 
+    dwin_var_write(qrcode->obj.value_addr, data, qrcode->max_len);
+    
+    return RT_EOK; 
 }

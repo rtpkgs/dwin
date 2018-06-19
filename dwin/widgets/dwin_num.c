@@ -64,8 +64,7 @@ struct dwin_num *dwin_num_create(struct dwin_page *page, rt_uint16_t addr, enum 
         }
     }
     
-    /* 没有自动上传的数据监听就关闭激活 */ 
-    dwin_obj_set_active(&(number->obj), RT_FALSE); 
+    dwin_obj_set_active(&(number->obj), RT_TRUE); 
     dwin_page_add_obj(page, &(number->obj)); 
     
     return number; 

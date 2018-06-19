@@ -161,11 +161,25 @@ void dwin_page_obj_info(struct dwin_page *page)
         
         if(obj->active)
         {
-            DWIN_PRINT("\tObj: type %s, addr 0x%.4x, size %d, active enable.\n", widgets_info[obj->type], obj->value_addr, obj->value_size); 
+            if(obj->value_size == DWIN_OBJ_VARY_LENGHT)
+            {
+                DWIN_PRINT("\tObj: type %s, addr 0x%.4x, size VaryLen, active enable.\n", widgets_info[obj->type], obj->value_addr, obj->value_size); 
+            }
+            else
+            {
+                DWIN_PRINT("\tObj: type %s, addr 0x%.4x, size %d, active enable.\n", widgets_info[obj->type], obj->value_addr, obj->value_size); 
+            }
         }
         else
         {
-            DWIN_PRINT("\tObj: type %s, addr 0x%.4x, size %d, active disable.\n", widgets_info[obj->type], obj->value_addr, obj->value_size); 
+            if(obj->value_size == DWIN_OBJ_VARY_LENGHT)
+            {
+                DWIN_PRINT("\tObj: type %s, addr 0x%.4x, size VaryLen, active disable.\n", widgets_info[obj->type], obj->value_addr, obj->value_size); 
+            }
+            else
+            {
+                DWIN_PRINT("\tObj: type %s, addr 0x%.4x, size %d, active disable.\n", widgets_info[obj->type], obj->value_addr, obj->value_size); 
+            }
         }
     }
 }

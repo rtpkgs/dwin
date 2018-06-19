@@ -71,11 +71,18 @@ static rt_err_t dwin_widgets_init(void)
 {
     dwin_button_init(); 
     dwin_scale_init(); 
+    dwin_gbk_init(); 
     dwin_gbk_input_init();
     dwin_num_init(); 
     dwin_num_input_init(); 
+    dwin_qrcode_init(); 
     
     return RT_EOK; 
+}
+
+rt_err_t dwin_run(rt_uint16_t page_id)
+{
+    return dwin_page_jump_id(page_id); 
 }
 
 /* ≥ı ºªØdwinø‚ */ 

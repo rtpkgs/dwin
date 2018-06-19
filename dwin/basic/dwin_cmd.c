@@ -56,8 +56,8 @@ static void uasge(uint8_t argc, char **argv)
     DWIN_PRINT("\033[36m  08. en or disable touch    dwin -s touch <enable|disable>\033[0m\n");
     DWIN_PRINT("\033[36m  09. set or read rtc        dwin -s rtc [year] [mon] [day] [hour] [min] [sec]\033[0m\n");
     DWIN_PRINT("\033[36m  10. send keycode(0x01~FF)  dwin -s key <code>\033[0m\n"); 
-    DWIN_PRINT("\033[36m  11. print register parse   dwin -d parse\033[0m\n"); 
-    DWIN_PRINT("\033[36m  12. print create pase      dwin -d page\033[0m\n"); 
+    DWIN_PRINT("\033[36m  11. print parses info      dwin -d parse\033[0m\n"); 
+    DWIN_PRINT("\033[36m  12. print pages info       dwin -d page\033[0m\n"); 
 }
 
 static void uasge_t(uint8_t argc, char **argv)

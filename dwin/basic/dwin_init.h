@@ -17,5 +17,6 @@
 #include "dwin_def.h" 
 
 int dwin_init(void); 
+rt_err_t dwin_run(rt_uint16_t page_id); 
 
 #endif 

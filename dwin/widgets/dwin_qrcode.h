@@ -19,10 +19,16 @@
 struct dwin_qrcode
 {
     struct dwin_obj obj; 
+    
+    rt_uint16_t max_len; 
 }; 
 typedef struct dwin_qrcode* dwin_qrcode_t; 
 
+rt_err_t dwin_qrcode_init(void); 
+struct dwin_qrcode *dwin_qrcode_create(struct dwin_page *page, rt_uint16_t addr, rt_uint16_t max_len); 
+rt_err_t dwin_qrcode_delect(struct dwin_qrcode *qrcode); 
+rt_err_t dwin_qrcode_show_string(struct dwin_qrcode *qrcode, char *string); 
 rt_err_t dwin_qrcode_show_url(struct dwin_qrcode *qrcode,char *url);
-rt_err_t dwin_qrcode_set_url(struct dwin_qrcode *qrcode,char *url);
+rt_err_t dwin_qrcode_clear(struct dwin_qrcode *qrcode); 
 
 #endif 

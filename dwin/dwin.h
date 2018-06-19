@@ -17,6 +17,7 @@
 #include "dwin_def.h" 
 
 /* basic */ 
+#include "dwin_init.h" 
 #include "dwin_trans.h" 
 #include "dwin_system.h" 
 
@@ -30,5 +31,6 @@
 #include "dwin_num_input.h"
 #include "dwin_gbk.h"
 #include "dwin_gbk_input.h"
+#include "dwin_qrcode.h"
 
 #endif 
