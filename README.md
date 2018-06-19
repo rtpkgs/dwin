@@ -1,9 +1,8 @@
 DWIN For RT-Thread
+================
 
 [![Build Status](https://travis-ci.org/liu2guang/dwin.svg?branch=v2.x.x)](https://travis-ci.org/liu2guang/dwin)
 [![License](https://img.shields.io/apm/l/vim-mode.svg)](https://github.com/liu2guang/dwin/blob/master/LICENSE)
-
-================
 
 DWIN库是基于MIT开源协议开源的"dwin串口屏幕快速开发库". 该库需要工作在RT-Thread(后文简写RTT)物联网操作系统上, 整个DWIN库基于RTT底层设备层框架进行开发, 只要支持串口设备的RTT BSP都可以直接env在线安装DWIN库. 
 
