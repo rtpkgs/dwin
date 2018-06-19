@@ -122,6 +122,30 @@ void dwin_parse_exe(rt_uint8_t *data, rt_uint8_t len)
     struct dwin_obj *obj_temp   = RT_NULL; 
     struct dwin_obj *obj_widget = RT_NULL; 
     
+    /* 遍历全局控件 */ 
+    for(list_widget = dwin.global_objs.next; list_widget != &(dwin.global_objs); list_widget = list_widget->next)
+    {
+        obj_temp = rt_list_entry(list_widget, struct dwin_obj, list); 
+        
+        if((obj_temp->value_addr == dwin_parse_addr(data)) && 
+           (obj_temp->active == RT_TRUE))
+        {
+            obj_widget = obj_temp;
+            
+            for(list_parse = dwin.parses.next; list_parse != &(dwin.parses); list_parse = list_parse->next)
+            {
+                parse = rt_list_entry(list_parse, struct dwin_parse, list); 
+                
+                if((parse->type == obj_widget->type) && (parse->event != RT_NULL))
+                {
+                    parse->event(obj_widget, data, len); 
+                    break; 
+                }
+            }
+        }
+    }
+    
+    /* 遍历当前页面所有控件 */ 
     for(list_widget = page->objs.next; list_widget != &(page->objs); list_widget = list_widget->next)
     {
         obj_temp = rt_list_entry(list_widget, struct dwin_obj, list); 

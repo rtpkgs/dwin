@@ -20,6 +20,7 @@
 #include "dwin_init.h" 
 #include "dwin_trans.h" 
 #include "dwin_system.h" 
+#include "dwin_parse.h" 
 
 /* obj and widgets */ 
 #include "dwin_obj.h" 
@@ -32,5 +33,7 @@
 #include "dwin_gbk.h"
 #include "dwin_gbk_input.h"
 #include "dwin_qrcode.h"
+#include "dwin_icon.h"
+
 
 #endif 

@@ -28,6 +28,7 @@ static void dwin_data_init(struct dwin *dwin)
     rt_list_init(&(dwin->parses));
     dwin->parse_num = 0; 
     dwin->parse_mq = rt_mq_create("dwin_parse", sizeof(struct dwin_data_frame), DWIN_USING_DATA_FRAME_DEPTH, RT_IPC_FLAG_FIFO); 
+    rt_list_init(&(dwin->global_objs)); 
 }
 
 static void dwin_verion_output(void)
@@ -76,6 +77,7 @@ static rt_err_t dwin_widgets_init(void)
     dwin_num_init(); 
     dwin_num_input_init(); 
     dwin_qrcode_init(); 
+    dwin_icon_init(); 
     
     return RT_EOK; 
 }

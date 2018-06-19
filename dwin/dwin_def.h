@@ -199,6 +199,8 @@ struct dwin_page
 }; 
 typedef struct dwin_page* dwin_page_t; 
 
+#define DWIN_ALL_PAGE ((struct dwin_page *)(0xFFFFFFFF)) /* 全局页面 */ 
+
 struct dwin_parse
 {
     rt_list_t list;
@@ -217,6 +219,7 @@ struct dwin
     rt_list_t   pages;          /* 页面链表 */ 
     rt_uint16_t page_num;       /* 页面数量 */ 
     struct dwin_page* page_cur; /* 当前页面 */ 
+    rt_list_t global_objs;      /* 全局控件 */ 
     
     /* 监听器相关 */ 
     dwin_watch_t watch; 

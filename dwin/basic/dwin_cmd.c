@@ -12,11 +12,8 @@
  */ 
  
 #include "dwin_cmd.h" 
-#include "dwin_trans.h" 
-#include "dwin_system.h" 
-#include "dwin_parse.h" 
-#include "dwin_page.h" 
 #include "finsh.h" 
+#include "dwin.h"
 
 static rt_uint32_t str2int(const char *str)
 {
